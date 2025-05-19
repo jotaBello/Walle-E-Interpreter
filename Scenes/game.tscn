@@ -1,0 +1,63 @@
+[gd_scene load_steps=2 format=3 uid="uid://b73lgiqugdsew"]
+
+[ext_resource type="Script" uid="uid://drtni40regruy" path="res://Scripts/CodeEdit.cs" id="1_ebmjs"]
+
+[node name="Interfaz" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.223103, 0.223103, 0.223103, 1)
+
+[node name="CodeEdit" type="CodeEdit" parent="." node_paths=PackedStringArray("codeEdit")]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -600.0
+offset_top = -267.0
+offset_right = -23.0
+offset_bottom = 147.0
+grow_horizontal = 0
+grow_vertical = 2
+placeholder_text = "Code here..."
+gutters_draw_line_numbers = true
+script = ExtResource("1_ebmjs")
+codeEdit = NodePath(".")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 59.0
+offset_top = -265.0
+offset_right = 522.0
+offset_bottom = 266.0
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -69.0
+offset_top = 12.0
+offset_right = -22.0
+offset_bottom = 50.0
+grow_horizontal = 0
+text = "RUN"
+
+[connection signal="pressed" from="Button" to="CodeEdit" method="_on_button_pressed"]
