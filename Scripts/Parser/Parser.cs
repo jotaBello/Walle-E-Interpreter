@@ -11,17 +11,41 @@ public class Parser
         this.tokens = tokens;
     }
 
-    public Expr parse()
+    public List<Stmt> parse() 
     {
-        try
+        List<Stmt> statements = new List<Stmt>();
+        while (!isAtEnd())
         {
-            return expression();
+            statements.Add(statement());
         }
-        catch (ParseError error)
-        {
-            return null;
-        }
+        return statements; 
     }
+
+    private Stmt statement()
+    {
+        if (match(TokenType.PRINT)) return printStatement();
+        return expressionStatement();
+    }
+
+    private Stmt printStatement()
+    {
+        Expr value = expression();
+        consume(TokenType.EOL, "Expect EOL after value.");
+        return new PrintStmt(value);
+    }
+
+    private Stmt expressionStatement()
+    {
+        Expr expr = expression();
+        consume(TokenType.EOL, "Expect EOL after expression.");
+
+        return new ExpressionStmt(expr);
+    }
+
+
+
+
+
 
 
 
@@ -138,7 +162,7 @@ public class Parser
 
     private ParseError error(Token token, string message)
     {
-        Interpreter.error(token, message);
+        Compiler.error(token, message);
         return new ParseError();
     }
 
@@ -155,9 +179,7 @@ public class Parser
         return previous();
     }
 
-
-
-
+    
     private bool isAtEnd()
     {
         return peek().type == TokenType.EOF;

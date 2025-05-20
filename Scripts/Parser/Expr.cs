@@ -1,45 +1,66 @@
 using System;
 
 public abstract class Expr
-{}
+{
+    virtual public Object accept(Interpreter interpreter)
+    {
+        return this;
+    }
+}
 public class Binary : Expr
 {
-    Expr left;
-    Token operation;
-    Expr right;
+    public Expr left;
+    public Token operation;
+    public Expr right;
     public Binary(Expr left, Token operation, Expr right)
     {
         this.left = left;
         this.operation = operation;
         this.right = right;
     }
+    override public Object accept(Interpreter interpreter)
+    {
+        return interpreter.visitBinaryExpr(this);
+    }
 }
 
 public class Grouping : Expr
 {
-    Expr expression;
+    public Expr expression;
     public Grouping(Expr expression)
     {
         this.expression = expression;
+    }
+    override public Object accept(Interpreter interpreter)
+    {
+        return interpreter.visitGroupingExpr(this);
     }
 }
 
 public class Literal : Expr
 {
-    Object value;
+    public Object value;
     public Literal(Object value)
     {
         this.value = value;
+    }
+    override public Object accept(Interpreter interpreter)
+    {
+        return interpreter.visitLiteralExpr(this);
     }
 }
 
 public class Unary : Expr
 {
-    Token operation;
-    Expr right;
+    public Token operation;
+    public Expr right;
     public Unary(Token operation, Expr right)
     {
         this.operation = operation;
         this.right = right;
+    }
+    override public Object accept(Interpreter interpreter)
+    {
+        return interpreter.visitUnaryExpr(this);
     }
 }

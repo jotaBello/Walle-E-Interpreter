@@ -86,6 +86,7 @@ public class Scanner
                 break;
 
             case '\n':
+                addToken(TokenType.EOL);
                 line++;
                 break;
 
@@ -160,6 +161,13 @@ public class Scanner
         {
             type = keywords[text];
         }
+        
+        //TEMPORAL
+        else if (text == "print")
+        {
+            type=TokenType.PRINT;
+        }
+
         else
         {
             type = TokenType.IDENTIFIER;

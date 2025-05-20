@@ -7,6 +7,6 @@ public partial class CodeEdit : Godot.CodeEdit
 
     public void _on_button_pressed()
     {
-        Interpreter.run(codeEdit.Text);
+        Compiler.run(codeEdit.Text);
     }
 }
