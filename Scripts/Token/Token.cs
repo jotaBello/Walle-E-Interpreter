@@ -36,7 +36,7 @@ public enum TokenType
     LESS_EQUAL,
 
     //Literals
-    IDENTIFIER, STRING, NUMBER,
+    IDENTIFIER, NUMBER,STRING,
 
     //Keywords
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,

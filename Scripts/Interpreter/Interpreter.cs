@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Godot;
 public class Interpreter
 {
+    private Environment environment = new Environment();
+
     public void interpret(List<Stmt> statements)
     {
         try
@@ -20,6 +22,7 @@ public class Interpreter
     
     private void execute(Stmt stmt)
     {
+        if(stmt !=null)
         stmt.accept(this);
     }
 
@@ -51,6 +54,52 @@ public class Interpreter
         //TEMPORAL
         GD.Print(value);
     }
+
+    public void visitVarStmt(VarStmt stmt)
+    {
+        Object value = null;
+
+        if (stmt.expression != null)
+        {
+            value = evaluate(stmt.expression);
+        }
+
+        environment.define(stmt.name.lexeme, value);
+    }
+    public Object visitVariableExpr(Variable expr)
+    {
+        return environment.get(expr.name);
+    }
+
+    public void visitBlockStmt(BlockStmt stmt)
+    {
+        executeBlock(stmt.statements, new Environment(environment));
+    }
+
+     void executeBlock(List<Stmt> statements,Environment environment)
+    {
+        Environment previous = this.environment;
+        try
+        {
+            this.environment = environment;
+            foreach (Stmt statement in statements)
+            {
+                execute(statement);
+            }
+        }
+        finally
+        {
+            this.environment = previous;
+        }
+    }
+
+
+
+
+
+
+
+
 
 
 
