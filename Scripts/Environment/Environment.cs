@@ -26,11 +26,11 @@ public class Environment
             values.Add(name, value);
         }
 
-        /*if (enclosing != null)
+        if (enclosing != null)
         {
             enclosing.define(name, value);
             return;
-        }*/
+        }
     }
 
     public void assign()
@@ -49,6 +49,6 @@ public class Environment
             if (enclosing != null) return enclosing.get(name);
         }
 
-        throw new RuntimeError(name, "UUndefined variable '" + name.lexeme + "'.");
+        throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }  
 }

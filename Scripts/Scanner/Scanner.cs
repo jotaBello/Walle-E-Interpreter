@@ -40,6 +40,8 @@ public class Scanner
         {"true",TokenType.AND},
         {"false",TokenType.AND},
         {"GoTo",TokenType.AND},
+        {"while",TokenType.WHILE},
+        {"for",TokenType.FOR}
     };
     
 
@@ -88,6 +90,12 @@ public class Scanner
                 if (match('|'))
                 {
                     addToken(TokenType.OR);
+                }
+                break;
+                case '&':
+                if (match('&'))
+                {
+                    addToken(TokenType.AND);
                 }
                 break;
 
@@ -172,13 +180,24 @@ public class Scanner
         {
             type = keywords[text];
         }
-        
-        //TEMPORAL
+
+
         else if (text == "print")
         {
-            type=TokenType.PRINT;
+            type = TokenType.PRINT;
         }
-
+        else if (text == "if")
+        {
+            type = TokenType.IF;   
+        }
+        else if (text == "else")
+        {
+            type = TokenType.ELSE;   
+        }
+        else if (text == "while")
+        {
+            type = TokenType.WHILE;   
+        }
         else
         {
             type = TokenType.IDENTIFIER;

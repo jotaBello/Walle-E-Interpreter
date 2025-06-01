@@ -77,3 +77,21 @@ public class Variable : Expr
 		return interpreter.visitVariableExpr(this);
 	}
 }
+
+public class Logical : Expr
+{
+	public Expr left;
+	public Token operation;
+	public Expr right;
+
+	public Logical(Expr left, Token operation, Expr right)
+	{
+		this.left = left;
+		this.operation = operation;
+		this.right = right;
+	}
+	override public Object accept(Interpreter interpreter)
+	{
+		return interpreter.visitLogicalExpr(this);
+	}
+}

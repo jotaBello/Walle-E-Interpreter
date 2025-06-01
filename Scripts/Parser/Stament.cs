@@ -66,3 +66,39 @@ public class BlockStmt : Stmt
 		interpreter.visitBlockStmt(this);
 	}
 }
+
+public class IfStmt : Stmt
+{
+	public Expr condition;
+
+	public Stmt thenBranch;
+	public Stmt elseBranch;
+
+	public IfStmt(Expr condition, Stmt thenBranch, Stmt elseBranch)
+	{
+		this.condition = condition;
+		this.thenBranch = thenBranch;
+		this.elseBranch = elseBranch;
+	}
+	override public void accept(Interpreter interpreter)
+	{
+		interpreter.visitIfStmt(this);
+	}
+}
+
+public class WhileStmt : Stmt
+{
+	public Expr condition;
+
+	public Stmt body;
+
+	public WhileStmt(Expr condition, Stmt body)
+	{
+		this.condition = condition;
+		this.body = body;
+	}
+	override public void accept(Interpreter interpreter)
+	{
+		interpreter.visitWhileStmt(this);
+	}
+}

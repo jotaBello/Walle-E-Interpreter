@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Microsoft.CSharp.RuntimeBinder;
 public class Interpreter
 {
     private Environment environment = new Environment();
@@ -14,21 +15,21 @@ public class Interpreter
                 execute(statement);
             }
         }
-        catch (RuntimeError error)
+        catch (RuntimeBinderException)
         {
-            Compiler.runtimeError(error);
+            //Compiler.runtimeError(error);
         }
     }
-    
+
     private void execute(Stmt stmt)
     {
-        if(stmt !=null)
-        stmt.accept(this);
+        if (stmt != null)
+            stmt.accept(this);
     }
 
-    
 
-    
+
+
     public Object visitLiteralExpr(Literal expr)
     {
         return expr.value;
@@ -76,7 +77,7 @@ public class Interpreter
         executeBlock(stmt.statements, new Environment(environment));
     }
 
-     void executeBlock(List<Stmt> statements,Environment environment)
+    void executeBlock(List<Stmt> statements, Environment environment)
     {
         Environment previous = this.environment;
         try
@@ -90,6 +91,18 @@ public class Interpreter
         finally
         {
             this.environment = previous;
+        }
+    }
+
+    public void visitIfStmt(IfStmt stmt)
+    {
+        if (isTruthy(evaluate(stmt.condition)))
+        {
+            execute(stmt.thenBranch);
+        }
+        else if (stmt.elseBranch != null)
+        {
+            execute(stmt.elseBranch);
         }
     }
 
@@ -191,12 +204,35 @@ public class Interpreter
         if (operand is int) return;
         throw new RuntimeError(operation, "Operand must be a number.");
     }
-    private void checkNumberOperand(Token operation,Object left, Object right) 
+    private void checkNumberOperand(Token operation, Object left, Object right)
     {
         if (left is int && right is int) return;
 
         throw new RuntimeError(operation, "Operands must be numbers.");
     }
+
+    public Object visitLogicalExpr(Logical expr)
+    {
+        Object left = evaluate(expr.left);
+        if (expr.operation.type == TokenType.OR)
+        {
+            if (isTruthy(left)) return left;
+        }
+        else
+        {
+            if (!isTruthy(left)) return left;
+        }
+        return evaluate(expr.right);
+    }
+
+    public void visitWhileStmt(WhileStmt stmt)
+    {
+        while (isTruthy(evaluate(stmt.condition)))
+        {
+            execute(stmt.body);
+        }
+    }
+ 
  
  
 

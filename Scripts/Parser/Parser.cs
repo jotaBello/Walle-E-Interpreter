@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using Microsoft.CSharp.RuntimeBinder;
@@ -14,10 +15,10 @@ public class Parser
 
 	public List<Stmt> parse()
 	{
-		List<Stmt> statements = new List<Stmt>();  
+		List<Stmt> statements = new List<Stmt>();
 		while (!isAtEnd())
 		{
-			SkipEOL();if (isAtEnd()) return statements;
+			SkipEOL(); if (isAtEnd()) return statements;
 			statements.Add(declaration());
 		}
 		return statements;
@@ -25,6 +26,9 @@ public class Parser
 
 	private Stmt statement()
 	{
+		if (match(TokenType.IF)) return ifStatement();
+		if (match(TokenType.WHILE)) return whileStatement();
+		if (match(TokenType.FOR)) return forStatement();
 		if (match(TokenType.PRINT)) return printStatement();
 		if (match(TokenType.LEFT_BRACE)) return new BlockStmt(block());
 		return expressionStatement();
@@ -33,14 +37,14 @@ public class Parser
 	private Stmt printStatement()
 	{
 		Expr value = expression();
-		consume("Expect EOL or EOF after value.",TokenType.EOL,TokenType.EOF);
+		consume("Expect EOL or EOF after value.", TokenType.EOL, TokenType.EOF);
 		return new PrintStmt(value);
 	}
 
 	private Stmt expressionStatement()
 	{
 		Expr expr = expression();
-		consume( "Expect EOL or EOF after expression.",TokenType.EOL,TokenType.EOF);
+		consume("Expect EOL or EOF after expression.", TokenType.EOL, TokenType.EOF);
 
 		return new ExpressionStmt(expr);
 	}
@@ -54,7 +58,17 @@ public class Parser
 
 		initializer = expression();
 
-		consume("Expect EOL or EOF after variable declaration.",TokenType.EOL,TokenType.EOF);
+		consume("Expect EOL or EOF after variable declaration.", TokenType.EOL, TokenType.EOF);
+		return new VarStmt(name, initializer);
+	}
+	private Stmt For_varDeclaration()
+	{
+		Back(); Back();
+		Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+		advance();
+		Expr initializer = null;
+
+		initializer = expression();
 		return new VarStmt(name, initializer);
 	}
 
@@ -72,20 +86,113 @@ public class Parser
 			return null;
 		}
 	}
+	private Stmt For_declaration()
+	{
+		try
+		{
+			if (match(TokenType.IDENTIFIER) && match(TokenType.VAR)) return For_varDeclaration();
+			return statement();
+		}
+		catch (ParseError)
+		{
+			synchronize();
+			return null;
+		}
+	}
 
-	 private List<Stmt> block()
+	private List<Stmt> block()
 	{
 		List<Stmt> statements = new List<Stmt>();
 		while (!check(TokenType.RIGHT_BRACE) && !isAtEnd())
 		{
 			SkipEOL();
-			if(peek().type!=TokenType.RIGHT_BRACE)
-			statements.Add(declaration());
+			if (peek().type != TokenType.RIGHT_BRACE)
+				statements.Add(declaration());
 		}
 
 		consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
 		return statements;
 	}
+
+	private Stmt ifStatement()
+	{
+		consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+		Expr condition = expression();
+		consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+		Stmt thenBranch = statement();
+		Stmt elseBranch = null;
+		if (match(TokenType.ELSE)) {
+			elseBranch = statement();
+		}
+		return new IfStmt(condition, thenBranch, elseBranch);
+	}
+
+	private Stmt whileStatement()
+	{
+		consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+		Expr condition = expression();
+		consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+		Stmt body = statement();
+		return new WhileStmt(condition, body);
+	}
+
+	private Stmt forStatement()
+	{
+		consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+
+		Stmt initializer;
+		if (match(TokenType.SEMICOLON))
+		{
+			initializer = null;
+		}
+		else if (match(TokenType.IDENTIFIER) && match(TokenType.VAR))
+		{
+			initializer = For_varDeclaration();
+		}
+		else
+		{
+			initializer = expressionStatement();
+		}
+		consume(TokenType.SEMICOLON, "Expect ';' after for initializer.");
+
+		Expr condition = null;
+		if (!check(TokenType.SEMICOLON))
+		{
+			condition = expression();
+			
+		}
+		consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+		Stmt increment = null;
+
+		if (!check(TokenType.RIGHT_PAREN))
+		{
+			increment = For_declaration();
+		}
+		consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+
+		Stmt body= statement();
+
+		if (increment != null)
+		{
+			body = new BlockStmt(new List<Stmt> { body,increment });
+		}
+
+		if (condition == null) condition = new Literal(true);
+ 		body = new WhileStmt(condition, body);
+
+		if (initializer != null)
+		{
+			body = new BlockStmt(new List<Stmt> { initializer, body });
+ 		}
+
+
+
+
+
+		return body;	
+	}
+
 
 
 
@@ -99,19 +206,48 @@ public class Parser
 	}
 
 	private Expr assignment() {
-		Expr expr = equality();
-		if (match(TokenType.VAR)) {
+
+		Expr expr = or();
+		
+		/*if (match(TokenType.VAR))
+		{
 			Token var = previous();
 			Expr value = assignment();
-			if (expr is Variable) {
+			if (expr is Variable)
+			{
 				Token name = ((Variable)expr).name;
 				//TEMPORAL
 				return new Variable(name);
 			}
 			error(var, "Invalid assignment target.");
-		}
+		}*/
 		return expr;
 	}
+	
+	private Expr or()
+	{
+		Expr expr = and();
+		while (match(TokenType.OR))
+		{
+			Token operation = previous();
+			Expr right = and();
+			expr = new Logical(expr, operation, right);
+		}
+ 		return expr;
+ 	}
+
+	private Expr and()
+	{
+		Expr expr = equality();
+		while (match(TokenType.AND))
+		{
+			Token operation = previous();
+			Expr right = equality();
+			expr = new Logical(expr, operation, right);
+		}
+		return expr;
+ 	}
+
 
 	private Expr equality()
 	{
@@ -123,7 +259,7 @@ public class Parser
 			expr = new Binary(expr, operation, right);
 		}
 		return expr;
-		
+
 	}
 	
 
