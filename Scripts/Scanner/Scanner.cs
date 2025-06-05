@@ -37,11 +37,13 @@ public class Scanner
 
     private static Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>()
     {
-        {"true",TokenType.AND},
-        {"false",TokenType.AND},
+        {"true",TokenType.TRUE},
+        {"false",TokenType.FALSE},
         {"GoTo",TokenType.AND},
         {"while",TokenType.WHILE},
-        {"for",TokenType.FOR}
+        {"for",TokenType.FOR},
+        {"return",TokenType.RETURN},
+        {"fun",TokenType.FUN}
     };
     
 
@@ -60,9 +62,12 @@ public class Scanner
             case '-': addToken(TokenType.MINUS); break;
             case '+': addToken(TokenType.PLUS); break;
             case ';': addToken(TokenType.SEMICOLON); break;
-            case '*': addToken(TokenType.STAR); break;
             case '/': addToken(TokenType.SLASH); break;
+            case '%': addToken(TokenType.MOD); break;
 
+            case '*':
+                addToken(match('*') ? TokenType.POW : TokenType.STAR);
+                break;
             case '!':
                 addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                 break;
@@ -180,8 +185,6 @@ public class Scanner
         {
             type = keywords[text];
         }
-
-
         else if (text == "print")
         {
             type = TokenType.PRINT;
@@ -202,6 +205,7 @@ public class Scanner
         {
             type = TokenType.IDENTIFIER;
         }
+        
         addToken(type);
     }
 

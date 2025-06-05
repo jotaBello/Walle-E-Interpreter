@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public abstract class Expr
 {
@@ -93,5 +94,25 @@ public class Logical : Expr
 	override public Object accept(Interpreter interpreter)
 	{
 		return interpreter.visitLogicalExpr(this);
+	}
+}
+
+public class Call : Expr
+{
+	public Token name;
+	public Token paren;
+	public List<Expr> parameters;
+	public int Arity;
+
+	public Call(Token name, Token paren, List<Expr> arguments)
+	{
+		this.name = name;
+		this.paren = paren;
+		this.parameters = arguments;
+		Arity=arguments.Count;
+	}
+	override public Object accept(Interpreter interpreter)
+	{
+		return interpreter.visitCallExpr(this);
 	}
 }

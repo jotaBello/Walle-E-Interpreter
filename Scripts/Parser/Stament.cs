@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Godot;
+
 using Microsoft.CSharp.RuntimeBinder;
 public abstract class Stmt
 {
@@ -101,4 +101,48 @@ public class WhileStmt : Stmt
 	{
 		interpreter.visitWhileStmt(this);
 	}
+}
+
+public class Function : Stmt
+{
+	public Token name;
+	public List<Token> parameters;
+	public List<Stmt> body;
+	public Environment closure;
+	public int Arity;
+	public Function(Token name, List<Token> parameters, List<Stmt> body)
+	{
+		this.name = name;
+		this.parameters = parameters;
+		this.body = body;
+		Arity =parameters.Count;
+	}
+	public Function(Token name, List<Token> parameters, List<Stmt> body, Environment closure)
+	{
+		this.name = name;
+		this.parameters = parameters;
+		this.body = body;
+		this.closure = closure;
+		Arity = parameters.Count;
+	}
+	override public void accept(Interpreter interpreter)
+	{
+		interpreter.visitFunctionStmt(this);
+	}
+}
+public class ReturnStmt : Stmt
+{
+	public Token keyword;
+	public Expr value;
+
+	public ReturnStmt(Token keyword, Expr value)
+	{
+		this.keyword = keyword;
+		this.value = value;
+	}
+	override public void accept(Interpreter interpreter)
+	{
+		interpreter.visitReturnStmt(this);
+	}
+
 }

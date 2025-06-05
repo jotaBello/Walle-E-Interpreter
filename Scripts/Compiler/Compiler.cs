@@ -38,18 +38,18 @@ public static class Compiler
 	private static void report(int line, string where, string message)
 	{
 		//TEMPORAL
-		//GD.Print("[line " + line + "] Error" + where + ": " + message);
-		throw new Exception();
-		hadError = true;
+		GD.Print("[line " + line + "] Error" + where + ": " + message);
+		/*throw new Exception();
+		hadError = true;*/
 	}
 
 	public static void runtimeError(RuntimeError error)
 	{
 		//TEMPORAL
-		/*GD.Print(error.message +
-		"\n[line " + error.token.line + "]");*/
-		throw new Exception();
-		hadRuntimeError = true;
+		GD.Print(error.message +
+		"\n[line " + error.token.line + "]");
+		/*throw new Exception();
+		hadRuntimeError = true;*/
 	}
  
 }

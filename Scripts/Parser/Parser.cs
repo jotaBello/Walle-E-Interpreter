@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Godot;
+
 using Microsoft.CSharp.RuntimeBinder;
 public class Parser
 {
@@ -27,6 +27,7 @@ public class Parser
 	private Stmt statement()
 	{
 		if (match(TokenType.IF)) return ifStatement();
+		if (match(TokenType.RETURN)) return returnStatement();
 		if (match(TokenType.WHILE)) return whileStatement();
 		if (match(TokenType.FOR)) return forStatement();
 		if (match(TokenType.PRINT)) return printStatement();
@@ -77,7 +78,18 @@ public class Parser
 	{
 		try
 		{
-			if (match(TokenType.IDENTIFIER) && match(TokenType.VAR)) return varDeclaration();
+			if (match(TokenType.FUN)) return function("function");
+			if (match(TokenType.IDENTIFIER))
+			{
+				if (match(TokenType.VAR))
+				{
+					return varDeclaration();
+				}
+				else
+				{
+					Back();
+				}
+			}
 			return statement();
 		}
 		catch (ParseError)
@@ -100,6 +112,32 @@ public class Parser
 		}
 	}
 
+	private Function function(String kind)
+	{
+		Token name=consume(TokenType.IDENTIFIER, " Expected function name");
+		consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
+		List<Token> parameters = new List<Token>();
+		if (!check(TokenType.RIGHT_PAREN))
+		{
+			do
+			{
+				if (parameters.Count >= 255)
+				{
+					error(peek(), "Can't have more than 255 parameters.");
+				}
+				parameters.Add(
+				consume(TokenType.IDENTIFIER, "Expect parameter name."));
+			} while (match(TokenType.COMMA));
+		}
+		consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+
+		consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
+		List<Stmt> body = block();
+		return new Function(name, parameters, body);
+ 
+	}
+
+
 	private List<Stmt> block()
 	{
 		List<Stmt> statements = new List<Stmt>();
@@ -119,9 +157,13 @@ public class Parser
 		consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
 		Expr condition = expression();
 		consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+		SkipEOL();
 		Stmt thenBranch = statement();
+		SkipEOL();
 		Stmt elseBranch = null;
-		if (match(TokenType.ELSE)) {
+		if (match(TokenType.ELSE))
+		{
+			SkipEOL();
 			elseBranch = statement();
 		}
 		return new IfStmt(condition, thenBranch, elseBranch);
@@ -132,6 +174,7 @@ public class Parser
 		consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
 		Expr condition = expression();
 		consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+		SkipEOL();
 		Stmt body = statement();
 		return new WhileStmt(condition, body);
 	}
@@ -171,6 +214,7 @@ public class Parser
 		}
 		consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
 
+		SkipEOL();
 		Stmt body= statement();
 
 		if (increment != null)
@@ -187,11 +231,20 @@ public class Parser
  		}
 
 
-
-
-
 		return body;	
 	}
+
+	private Stmt returnStatement()
+	{
+		Token keyword = previous();
+		Expr value = null;
+		if (!check(TokenType.SEMICOLON)) {
+		value = expression();
+		}
+		consume(TokenType.EOL, "Expect 'EOL' after return value.");
+		return new ReturnStmt(keyword, value);
+ 	}
+
 
 
 
@@ -290,7 +343,7 @@ public class Parser
 	private Expr factor()
 	{
 		Expr expr = unary();
-		while (match(TokenType.SLASH, TokenType.STAR))
+		while (match(TokenType.SLASH, TokenType.STAR,TokenType.MOD,TokenType.POW))
 		{
 			Token operation = previous();
 			Expr right = unary();
@@ -307,8 +360,44 @@ public class Parser
 			Expr right = unary();
 			return new Unary(operation, right);
 		}
-		return primary();
+		return call();
 	}
+
+	private Expr call()
+	{
+		if (check(TokenType.IDENTIFIER) && Nextcheck(TokenType.LEFT_PAREN))
+		{
+			Token name = consume(TokenType.IDENTIFIER, "Expected function name");
+			if (match(TokenType.LEFT_PAREN))
+			{
+				return finishCall(name);
+			}
+		}
+		else return primary();
+
+		//unreachable
+		return null;
+	}
+	private Expr finishCall(Token name)
+	{
+		List<Expr> arguments = new List<Expr>();
+		if (!check(TokenType.RIGHT_PAREN))
+		{
+			do
+			{
+				if (arguments.Count >= 255)
+				{
+					error(peek(), "Can't have more than 255 arguments.");
+				}
+				arguments.Add(expression());
+
+			} while (match(TokenType.COMMA));
+		}
+		Token paren = consume(TokenType.RIGHT_PAREN,"Expect ')' after arguments.");
+		return new Call(name, paren, arguments);
+	}
+
+
 
 	private Expr primary()
 	{
@@ -327,11 +416,11 @@ public class Parser
 		}
 		if (match(TokenType.IDENTIFIER))
 		{
-		 return new Variable(previous());
+			return new Variable(previous());
 		}
 
 		throw error(peek(), "Expect expression.");
- }
+	}
 
 
 	private void synchronize()
@@ -404,6 +493,11 @@ public class Parser
 		if (isAtEnd()) return false;
 		return peek().type == type;
 	}
+	private bool Nextcheck(TokenType type)
+	{
+		if (isAtEnd()) return false;
+		return Nextpeek().type == type;
+	}
 
 	private Token advance()
 	{
@@ -425,6 +519,10 @@ public class Parser
 	private Token peek()
 	{
 		return tokens[current];
+	}
+	private Token Nextpeek()
+	{
+		return tokens[current+1];
 	}
 
 	private Token previous()
