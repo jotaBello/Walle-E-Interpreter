@@ -8,16 +8,16 @@ public class Interpreter
 
 	public Interpreter()
 	{
-		//globals.define("clock", new Clock());
+		//
 	}
 
 
 	private Environment environment = new Environment();
 
-
 	public void interpret(List<Stmt> statements)
 	{
 		environment = globals;
+
 		try
 		{
 			foreach (Stmt statement in statements)
@@ -127,33 +127,58 @@ public class Interpreter
 				parameters.Add(evaluate(param));
 			}
 
-			//TEMPORAL
-			switch (expr.name.lexeme)
+			try
 			{
-				case "rand":
-					Random result = new Random();
-					return result.NextDouble();
-				case "cos":
-					return (double)Math.Cos((double)parameters[0]);
-				case "sin":
-					return (double)Math.Sin((double)parameters[0]);
-				case "exp":
-					return (double)Math.Exp((double)parameters[0]);
-				case "print":
-					Console.WriteLine(parameters[0]);
-					return parameters[0];
-				case "sqrt":
-					return (double)Math.Sqrt((double)parameters[0]);
-				case "log":
-					return (double)Math.Log((double)parameters[1], (double)parameters[0]);
-				default:
-					throw new NotImplementedException();
+				switch (expr.name.lexeme)
+				{
+					case "Spawn":
+						checkNumbersInFunctions(expr.name, parameters[0], parameters[1]);
+						Spawn((int)parameters[0], (int)parameters[1]);
+						break;
+					case "Color":
+						checkStringInFunctions(expr.name, parameters[0]);
+						Color((string)parameters[0]);
+						break;
+					case "Size":
+						checkNumbersInFunctions(expr.name, parameters[0]);
+						Size((int)parameters[0]);
+						break;
+					case "DrawLine":
+						checkNumbersInFunctions(expr.name, parameters[0], parameters[1], parameters[2]);
+						DrawLine((int)parameters[0], (int)parameters[1], (int)parameters[2]);
+						break;
+					case "DrawCircle":
+						checkNumbersInFunctions(expr.name, parameters[0], parameters[1], parameters[2]);
+						DrawCircle((int)parameters[0], (int)parameters[1], (int)parameters[2]);
+						break;
+					case "DrawRectangle":
+						checkNumbersInFunctions(expr.name, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+						DrawRectangle((int)parameters[0], (int)parameters[1], (int)parameters[2], (int)parameters[3], (int)parameters[4]);
+						break;
+					case "Fill":
+						Fill();
+						break;
+					case "rand":
+						checkNumbersInFunctions(expr.name, parameters[0], parameters[1]);
+						Random random = new Random();
+						return random.Next((int)parameters[0], (int)parameters[1]);
+					case "GetColor":
+						checkNumbersInFunctions(expr.name, parameters[0], parameters[1]);
+						return GetColor((int)parameters[0],(int)parameters[1]);
+					default:
+						throw new NotImplementedException();
+				}
+				return null;
+			}
+			catch (RuntimeError error)
+			{
+				Compiler.runtimeError(new RuntimeError(expr.name, error.message));
 			}
 		}
 
 		if (!environment.IsFunction(expr.name))
 		{
-			Compiler.runtimeError(new RuntimeError(expr.name, "Expected X function."));
+			Compiler.runtimeError(new RuntimeError(expr.name, "Expected function."));
 			return null;
 		}
 
@@ -164,19 +189,19 @@ public class Interpreter
 		}
 
 		List<Token> args = environment.GetParameters(expr.name.lexeme, expr.Arity);
-		Environment closure = environment.GetClosure(expr.name.lexeme,expr.Arity);
+		Environment closure = environment.GetClosure(expr.name.lexeme, expr.Arity);
 
 		Environment environm = new Environment(closure);
 
-		for(int i=0;i<expr.parameters.Count;i++)
+		for (int i = 0; i < expr.parameters.Count; i++)
 		{
-			environm.define(args[i].lexeme,evaluate(expr.parameters[i]));
+			environm.define(args[i].lexeme, evaluate(expr.parameters[i]));
 		}
 		var body = new BlockStmt(environment.GetBody(expr.name.lexeme, expr.Arity));
 
 		try
 		{
-			executeBlock(body.statements,environm);
+			executeBlock(body.statements, environm);
 		}
 		catch (Return ret)
 		{
@@ -236,13 +261,14 @@ public class Interpreter
 				return (int)left * (int)right;
 			case TokenType.PLUS:
 				checkNumberOperand(expr.operation, left, right);
-				return (int)left + (int)right;
+				if (left is int) return (int)left + (int)right;
+				return (string)left + (string)right;
 			case TokenType.MOD:
 				checkNumberOperand(expr.operation, left, right);
 				return (int)left % (int)right;
 			case TokenType.POW:
 				checkNumberOperand(expr.operation, left, right);
-				return Math.Pow((int)left , (int)right);
+				return Math.Pow((int)left, (int)right);
 		}
 
 
@@ -275,10 +301,23 @@ public class Interpreter
 	}
 	private void checkNumberOperand(Token operation, Object left, Object right)
 	{
-		if (left is int && right is int) return;
+		if (left is int && right is int || left is string && right is string) return;
 
-		throw new RuntimeError(operation, "Operands must be numbers.");
+		throw new RuntimeError(operation, "Both operands must be numbers or strings.");
 	}
+	private void checkNumbersInFunctions(Token funName, params Object[] parameters)
+	{
+		foreach (Object obj in parameters)
+			if (!(obj is int))
+				throw new RuntimeError(funName, "Arguments must be numbers.");
+	}
+	private void checkStringInFunctions(Token funName, params Object[] parameters)
+	{
+		foreach (Object obj in parameters)
+			if (!(obj is string))
+				throw new RuntimeError(funName, "Argument must be string.");
+	}
+
 
 	public Object visitLogicalExpr(Logical expr)
 	{
@@ -313,6 +352,41 @@ public class Interpreter
 		if (stmt.value != null) value = evaluate(stmt.value);
 		throw new Return(value);
 	}
+
+	void Spawn(int x, int y)
+	{
+		Paint.Spawn(x, y);
+	}
+	void Color(string color)
+	{
+		Paint.Color(color);
+	}
+	void Size(int k)
+	{
+		Paint.Size(k);
+	}
+	void DrawLine(int dirX, int dirY, int distance)
+	{
+		Paint.DrawLine(dirX, dirY, distance);
+	}
+	void DrawCircle(int dirX, int dirY, int radius)
+	{
+		Paint.DrawCircle(dirX, dirY, radius);
+	}
+	void DrawRectangle(int dirX, int dirY, int distance, int width, int height)
+
+	{
+		Paint.DrawRectangle(dirX, dirY, distance, width, height);
+	}
+	void Fill()
+	{
+		Paint.Fill();
+	}
+	string GetColor(int x,int y)
+	{
+		return Paint.GetColor(x,y);
+	}
+	
  
  
  

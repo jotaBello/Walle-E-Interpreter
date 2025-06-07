@@ -7,7 +7,7 @@ public partial class CodeEdit : Godot.CodeEdit
 
 	public void _on_button_pressed()
 	{
-		Console.WriteLine("debug in vscode");
+		Paint.ClearCanvas();
 		Compiler.run(codeEdit.Text);
 	}
 }

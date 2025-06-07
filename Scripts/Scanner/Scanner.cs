@@ -114,7 +114,7 @@ public class Scanner
                 line++;
                 break;
 
-
+            case '"': sstring(); break;
 
             default:
                 if (isDigit(c))
@@ -133,11 +133,29 @@ public class Scanner
         }
     }
 
-    private char advance()
+    private void sstring() 
     {
-        current++;
-        return source[current - 1];
+        while (peek() != '"' && !isAtEnd())
+        {
+            if (peek() == '\n') line++;
+            advance();
+        }
+        if (isAtEnd())
+        {
+            //ERROR
+            return;
+        }
+
+        advance();
+        string value = source.Substring(start +1 , current - start-2);
+        addToken(TokenType.STRING, value);
     }
+
+    private char advance()
+{
+    current++;
+    return source[current - 1];
+}
 
     private void addToken(TokenType type)
     {

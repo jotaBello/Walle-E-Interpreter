@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://b73lgiqugdsew"]
+[gd_scene load_steps=3 format=3 uid="uid://b73lgiqugdsew"]
 
 [ext_resource type="Script" uid="uid://drtni40regruy" path="res://Scripts/CodeEdit.cs" id="1_ebmjs"]
+[ext_resource type="Script" uid="uid://bd38g31btn5k0" path="res://Scripts/PwCanvas.cs" id="3_wrm1d"]
 
 [node name="Interfaz" type="Control"]
 layout_mode = 3
@@ -37,16 +38,17 @@ gutters_draw_line_numbers = true
 script = ExtResource("1_ebmjs")
 codeEdit = NodePath(".")
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="PwCanvas" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = 59.0
-offset_top = -265.0
-offset_right = 522.0
-offset_bottom = 266.0
+offset_left = 31.0
+offset_top = -258.0
+offset_right = 63.0
+offset_bottom = -226.0
 grow_vertical = 2
+script = ExtResource("3_wrm1d")
 
 [node name="Button" type="Button" parent="."]
 layout_mode = 1

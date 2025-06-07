@@ -131,6 +131,7 @@ public class Parser
 		}
 		consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
 
+		SkipEOL();
 		consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
 		List<Stmt> body = block();
 		return new Function(name, parameters, body);

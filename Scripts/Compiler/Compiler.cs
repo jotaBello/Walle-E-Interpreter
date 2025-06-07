@@ -39,8 +39,8 @@ public static class Compiler
 	{
 		//TEMPORAL
 		GD.Print("[line " + line + "] Error" + where + ": " + message);
-		/*throw new Exception();
-		hadError = true;*/
+		throw new Exception();
+		//hadError = true;
 	}
 
 	public static void runtimeError(RuntimeError error)
@@ -48,8 +48,8 @@ public static class Compiler
 		//TEMPORAL
 		GD.Print(error.message +
 		"\n[line " + error.token.line + "]");
-		/*throw new Exception();
-		hadRuntimeError = true;*/
+		throw new Exception();
+		//hadRuntimeError = true;
 	}
  
 }

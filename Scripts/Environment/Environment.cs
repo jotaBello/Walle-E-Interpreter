@@ -8,13 +8,15 @@ public class Environment
 	private Dictionary<string, Dictionary<int, Function>> funGlobal = new Dictionary<string, Dictionary<int, Function>>();
 	private HashSet<(string, int)> builtins = new HashSet<(string, int)>()
   {
-	("rand", 0),
-	("cos", 1),
-	("exp", 1),
-	("print", 1),
-	("sin", 1),
-	("sqrt", 1),
-	("log", 2)
+	("Spawn", 2),
+	("Color", 1),
+	("Size", 1),
+	("DrawLine", 3),
+	("DrawCircle", 3),
+	("DrawRectangle", 5),
+	("Fill", 0),
+	("rand",2),
+	("GetColor",2),
   };
 
 	public Environment()

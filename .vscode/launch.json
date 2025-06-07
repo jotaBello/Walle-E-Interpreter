@@ -1,69 +1,15 @@
 {
-    "version": "2.0.0",
+    "version": "0.2.0",
     "configurations": [
         {
-            "name" : "PLay in Editor",
-            "type" : "godot-mono",
-            "mode" : "playInEditor",
-            "request": "launch"
-
+            "name": "Play",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "C:/Users/JOSE/Downloads/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64_console.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
         }
-        ,
-        {
-            "name": "Launch",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "C:\\Users\\JOSE\\Downloads\\Godot_v4.4.1-stable_mono_win64\\Godot_v4.4.1-stable_mono_win64_console.exe",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopAtEntry": false,
-            "args": [
-                "--path",
-                "${workspaceRoot}"
-            ]
-        },
-        {
-            "name": "Launch (Select Scene)",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "C:\\Users\\JOSE\\Downloads\\Godot_v4.4.1-stable_mono_win64\\Godot_v4.4.1-stable_mono_win64_console.exe",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopAtEntry": false,
-            "args": [
-                "--path",
-                "${workspaceRoot}",
-                "${command:godot.csharp.getLaunchScene}"
-            ]
-        },
-        {
-            "name": "Launch Editor",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "C:\\Users\\JOSE\\Downloads\\Godot_v4.4.1-stable_mono_win64\\Godot_v4.4.1-stable_mono_win64_console.exe",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopAtEntry": false,
-            "args": [
-                "--path",
-                "${workspaceRoot}",
-                "--editor"
-            ]
-        },
-        {
-            "name": "Attach to Process",
-            "type": "coreclr",
-            "request": "attach"
-        },
-        {
-      "name": "Attach to Godot",
-      "type": "coreclr",
-      "request": "attach",
-      "processName": "Godot_v4.4.1-stable_mono_win64",
-      "justMyCode": false
-    }
     ]
 }
