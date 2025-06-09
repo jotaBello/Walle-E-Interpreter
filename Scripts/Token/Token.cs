@@ -26,7 +26,7 @@ public enum TokenType
 {
     //Single Character Tokens
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE,
-    RIGHT_BRACE, COMMA, DOT, MINUS, PLUS,
+    RIGHT_BRACE,LEFT_COR,RIGHT_COR, COMMA, DOT, MINUS, PLUS,
     SEMICOLON, SLASH, STAR,MOD,POW,
 
     //One or Two Character Tokens
@@ -40,7 +40,7 @@ public enum TokenType
 
     //Keywords
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
-    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE, GOTO,
 
     EOL,
     EOF

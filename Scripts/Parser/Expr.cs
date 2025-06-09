@@ -7,6 +7,10 @@ public abstract class Expr
 	{
 		return this;
 	}
+	/*virtual public Object accept(Resolver interpreter)
+	{
+		return this;
+	}*/
 }
 public class Binary : Expr
 {

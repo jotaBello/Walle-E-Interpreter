@@ -1,4 +1,6 @@
+using System.Buffers.Text;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 
 using Microsoft.CSharp.RuntimeBinder;
 public abstract class Stmt
@@ -7,6 +9,10 @@ public abstract class Stmt
 	{
 		//TEMPORAL
 	}
+	/*virtual public void accept(Resolver interpreter)
+	{
+		//TEMPORAL
+	}*/
 }
 
 public class PrintStmt : Stmt
@@ -89,7 +95,6 @@ public class IfStmt : Stmt
 public class WhileStmt : Stmt
 {
 	public Expr condition;
-
 	public Stmt body;
 
 	public WhileStmt(Expr condition, Stmt body)
@@ -143,6 +148,38 @@ public class ReturnStmt : Stmt
 	override public void accept(Interpreter interpreter)
 	{
 		interpreter.visitReturnStmt(this);
+	}
+
+}
+public class LabelStmt : Stmt
+{
+	public Token name;
+	public int index;
+
+	public LabelStmt(Token name)
+	{
+		this.name = name;
+	}
+	override public void accept(Interpreter interpreter)
+	{
+		interpreter.visitLabelStmt(this);
+	}
+
+}
+public class GoToStmt : Stmt
+{
+	public Token label;
+
+	public Expr condition;
+
+	public GoToStmt(Token label, Expr condition)
+	{
+		this.label = label;
+		this.condition = condition;
+	}
+	override public void accept(Interpreter interpreter)
+	{
+		interpreter.visitGoToStmt(this);
 	}
 
 }

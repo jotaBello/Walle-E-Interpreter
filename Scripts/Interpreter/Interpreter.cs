@@ -4,37 +4,46 @@ using Microsoft.CSharp.RuntimeBinder;
 using Godot;
 public class Interpreter
 {
-	public Environment globals = new Environment();
-
-	public Interpreter()
-	{
-		//
-	}
-
-
 	private Environment environment = new Environment();
+
+	private int current = 0;
 
 	public void interpret(List<Stmt> statements)
 	{
-		environment = globals;
-
 		try
 		{
-			foreach (Stmt statement in statements)
+			ResolveLabels(statements);
+			current = 0;
+
+			for (; current < statements.Count; current++)
 			{
-				execute(statement);
+				if (!Compiler.hadRuntimeError && !(statements[current] is LabelStmt))
+				{
+					execute(statements[current]);
+				}
 			}
+
 		}
-		catch (RuntimeBinderException)
+		catch (RuntimeError error)
 		{
-			//Compiler.runtimeError(error);
+			Compiler.runtimeError(error);
 		}
 	}
 
 	private void execute(Stmt stmt)
 	{
-		if (stmt != null)
-			stmt.accept(this);
+		stmt.accept(this);
+	}
+
+	void ResolveLabels(List<Stmt> stmts)
+	{
+		for (; current < stmts.Count; current++)
+			{
+				if (stmts[current] is LabelStmt)
+				{
+					stmts[current].accept(this);
+				}
+			}
 	}
 
 
@@ -86,6 +95,18 @@ public class Interpreter
 	public void visitBlockStmt(BlockStmt stmt)
 	{
 		executeBlock(stmt.statements, new Environment(environment));
+	}
+	public void visitLabelStmt(LabelStmt stmt)
+	{
+		stmt.index = current;
+		environment.labeldefine(stmt.name,stmt.index);
+	}
+	public void visitGoToStmt(GoToStmt stmt)
+	{
+		if (isTruthy(evaluate(stmt.condition)))
+		{
+			current = environment.labelget(stmt.label);
+		}
 	}
 
 	public void executeBlock(List<Stmt> statements, Environment environment)
@@ -164,7 +185,27 @@ public class Interpreter
 						return random.Next((int)parameters[0], (int)parameters[1]);
 					case "GetColor":
 						checkNumbersInFunctions(expr.name, parameters[0], parameters[1]);
-						return GetColor((int)parameters[0],(int)parameters[1]);
+						return GetColor((int)parameters[0], (int)parameters[1]);
+					case "GetActualX":
+						return GetActualX();
+					case "GetActualY":
+						return GetActualY();
+					case "GetCanvasSize":
+						return GetCanvasSize();
+					case "GetColorCount":
+						checkStringInFunctions(expr.name, parameters[0]);
+						checkNumbersInFunctions(expr.name, parameters[1], parameters[2], parameters[3], parameters[4]);
+						return GetColorCount((string)parameters[0], (int)parameters[1], (int)parameters[2], (int)parameters[3], (int)parameters[4]);
+					case "IsBrushColor":
+						checkStringInFunctions(expr.name, parameters[0]);
+						return IsBrushColor((string)parameters[0]);
+					case "IsBrushSize":
+						checkNumbersInFunctions(expr.name, parameters[0]);
+						return IsBrushSize((int)parameters[0]);
+					case "IsCanvasColor":
+						checkStringInFunctions(expr.name, parameters[0]);
+						checkNumbersInFunctions(expr.name, parameters[1], parameters[2]);
+						return IsCanvasColor((string)parameters[0], (int)parameters[1], (int)parameters[2]);
 					default:
 						throw new NotImplementedException();
 				}
@@ -382,9 +423,37 @@ public class Interpreter
 	{
 		Paint.Fill();
 	}
-	string GetColor(int x,int y)
+	string GetColor(int x, int y)
 	{
-		return Paint.GetColor(x,y);
+		return Paint.GetColor(x, y);
+	}
+	public static int GetActualX()
+	{
+		return Paint.GetActualX();
+	}
+	public static int GetActualY()
+	{
+		return Paint.GetActualY();
+	}
+	public static int GetCanvasSize()
+	{
+		return Paint.GetCanvasSize();
+	}
+	public static int GetColorCount(string color, int x1, int y1, int x2, int y2)
+	{
+		return Paint.GetColorCount(color, x1, y1, x2, y2);
+	}
+	public static int IsBrushColor(string color)
+	{
+		return Paint.IsBrushColor(color);
+	}
+	public static int IsBrushSize(int size)
+	{
+		return Paint.IsBrushSize(size);
+	}
+	public static int IsCanvasColor(string color, int vertical, int horizontal)
+	{
+		return Paint.IsCanvasColor(color,vertical,horizontal);
 	}
 	
  

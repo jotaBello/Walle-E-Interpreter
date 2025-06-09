@@ -93,6 +93,10 @@ public static class Paint
 				colorBrush = PwColor.Black;
 				pwcolorBrush = Colors.Black;
 				break;
+			case "Orange":
+				colorBrush = PwColor.Orange;
+				pwcolorBrush = Colors.Orange;
+				break;
 			case "White":
 				colorBrush = PwColor.White;
 				pwcolorBrush = Colors.White;
@@ -228,17 +232,39 @@ public static class Paint
 					queue.Enqueue(new Tuple<int, int>(h, k));
 				}
 			}
-			SetPixel(current.Item1, current.Item2, pwcolorBrush);
+			SetOnePixel(current.Item1, current.Item2, pwcolorBrush);
 		}
 		UpdateTexture();
+	}
+	public static void SetOnePixel(int x, int y, Godot.Color color)
+	{
+		if (colorBrush != PwColor.Transparent)
+		{
+			canvas[x, y] = colorBrush;
+			pwCanvas.SetPixel(x, y, color);
+		}
 	}
 
 	public static void SetPixel(int x, int y, Godot.Color color)
 	{
 		if (colorBrush != PwColor.Transparent)
 		{
-			canvas[x, y] = colorBrush;
-			pwCanvas.SetPixel(x, y, color);
+			for (int i = 0; i < canvas.GetLength(0); i++)
+			{
+				for (int j = 0; j < canvas.GetLength(1); j++)
+				{
+					if (isOnTheSquare(i, j))
+					{
+						canvas[i, j] = colorBrush;
+						pwCanvas.SetPixel(i, j, color);
+					}
+				}
+			}
+
+		}
+		bool isOnTheSquare(int i, int j)
+		{
+			return Math.Max(Math.Abs(i - x), Math.Abs(j - y)) <= sizeBrush / 2;
 		}
 	}
 	public static void UpdateTexture()
@@ -259,8 +285,55 @@ public static class Paint
 	}
 	public static string GetColor(int x, int y)
 	{
-		if(!isOnTheBounds(x, y))throw new RuntimeError(null, "Is an invalid pixel");
-		return canvas[x,y].ToString();
+		if (!isOnTheBounds(x, y)) throw new RuntimeError(null, "Is an invalid pixel");
+		return canvas[x, y].ToString();
 	}
+	public static int GetActualX()
+	{
+		return wall_ePosition.Item1;
+	}
+	public static int GetActualY()
+	{
+		return wall_ePosition.Item2;
+	}
+	public static int GetCanvasSize()
+	{
+		return canvas.GetLength(0);
+	}
+	public static int GetColorCount(string color, int x1, int y1, int x2, int y2)
+	{
+		if (!isOnTheBounds(x1, y1) || !isOnTheBounds(x2, y2)) return 0;
+
+		int count = 0;
+
+		for (int i = x1; i <= x2; i++)
+		{
+			for (int j = y1; j <= y2; j++)
+			{
+				if (canvas[i, j].ToString() == color)
+				{
+					count++;
+				}
+			}
+		}
+
+		return count;
+	}
+	public static int IsBrushColor(string color)
+	{
+		return color == colorBrush.ToString() ? 1 : 0;
+	}
+	public static int IsBrushSize(int size)
+	{
+		return size == sizeBrush ? 1 : 0;
+	}
+	public static int IsCanvasColor(string color, int vertical, int horizontal)
+	{
+		int h = wall_ePosition.Item1 + vertical;
+		int k = wall_ePosition.Item2 + horizontal;
+		if (!isOnTheBounds(h, k)) return 0;
+		return canvas[h,k].ToString()==color? 1 : 0;
+	}
+
 
 }

@@ -29,6 +29,7 @@ public class Parser
 		if (match(TokenType.IF)) return ifStatement();
 		if (match(TokenType.RETURN)) return returnStatement();
 		if (match(TokenType.WHILE)) return whileStatement();
+		if (match(TokenType.GOTO)) return GoToStatement();
 		if (match(TokenType.FOR)) return forStatement();
 		if (match(TokenType.PRINT)) return printStatement();
 		if (match(TokenType.LEFT_BRACE)) return new BlockStmt(block());
@@ -62,6 +63,13 @@ public class Parser
 		consume("Expect EOL or EOF after variable declaration.", TokenType.EOL, TokenType.EOF);
 		return new VarStmt(name, initializer);
 	}
+	private Stmt labelDeclaration()
+	{
+		Back();Back();
+		Token name = consume(TokenType.IDENTIFIER, "Expect label name.");
+		consume("Expect EOL or EOF after label declaration.", TokenType.EOL, TokenType.EOF);
+		return new LabelStmt(name);
+	}
 	private Stmt For_varDeclaration()
 	{
 		Back(); Back();
@@ -84,6 +92,10 @@ public class Parser
 				if (match(TokenType.VAR))
 				{
 					return varDeclaration();
+				}
+				else if (match(TokenType.EOL))
+				{
+					return labelDeclaration();
 				}
 				else
 				{
@@ -179,6 +191,18 @@ public class Parser
 		Stmt body = statement();
 		return new WhileStmt(condition, body);
 	}
+	private Stmt GoToStatement()
+	{
+		consume(TokenType.LEFT_COR, "Expect '[' after 'GoTo'.");
+		Token label = consume(TokenType.IDENTIFIER, "Expect label in 'GoTo'.");
+		consume(TokenType.RIGHT_COR, "Expect ']' after label");
+
+		consume(TokenType.LEFT_PAREN, "Expect '(' after 'GoTo'.");
+		Expr condition = expression();
+		consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+
+		return new GoToStmt(label,condition);
+	}
 
 	private Stmt forStatement()
 	{
@@ -203,7 +227,7 @@ public class Parser
 		if (!check(TokenType.SEMICOLON))
 		{
 			condition = expression();
-			
+
 		}
 		consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
 
@@ -216,23 +240,23 @@ public class Parser
 		consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
 
 		SkipEOL();
-		Stmt body= statement();
+		Stmt body = statement();
 
 		if (increment != null)
 		{
-			body = new BlockStmt(new List<Stmt> { body,increment });
+			body = new BlockStmt(new List<Stmt> { body, increment });
 		}
 
 		if (condition == null) condition = new Literal(true);
- 		body = new WhileStmt(condition, body);
+		body = new WhileStmt(condition, body);
 
 		if (initializer != null)
 		{
 			body = new BlockStmt(new List<Stmt> { initializer, body });
- 		}
+		}
 
 
-		return body;	
+		return body;
 	}
 
 	private Stmt returnStatement()

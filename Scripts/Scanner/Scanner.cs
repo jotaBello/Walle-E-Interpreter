@@ -26,6 +26,7 @@ public class Scanner
             scanToken();
         }
 
+        tokens.Add(new Token(TokenType.EOL, "", null, line));
         tokens.Add(new Token(TokenType.EOF, "", null, line));
         return tokens;
     }
@@ -39,7 +40,7 @@ public class Scanner
     {
         {"true",TokenType.TRUE},
         {"false",TokenType.FALSE},
-        {"GoTo",TokenType.AND},
+        {"GoTo",TokenType.GOTO},
         {"while",TokenType.WHILE},
         {"for",TokenType.FOR},
         {"return",TokenType.RETURN},
@@ -57,6 +58,8 @@ public class Scanner
             case ')': addToken(TokenType.RIGHT_PAREN); break;
             case '{': addToken(TokenType.LEFT_BRACE); break;
             case '}': addToken(TokenType.RIGHT_BRACE); break;
+            case '[': addToken(TokenType.LEFT_COR); break;
+            case ']': addToken(TokenType.RIGHT_COR); break;
             case ',': addToken(TokenType.COMMA); break;
             case '.': addToken(TokenType.DOT); break;
             case '-': addToken(TokenType.MINUS); break;

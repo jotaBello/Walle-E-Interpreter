@@ -4,23 +4,35 @@ using Godot;
 
 public static class Compiler
 {
-	private static Interpreter interpreter = new Interpreter();
-	static bool hadError = false;
-	static bool hadRuntimeError = false;
+	private static Interpreter interpreter;
+	public static bool hadError = false;
+	public static bool hadRuntimeError = false;
 
 
 	public static void run(string source)
 	{
 		Scanner scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
+		if (hadError) return;
 
 		Parser parser = new Parser(tokens);
 		List<Stmt> statements = parser.parse();
-
 		if (hadError) return;
-		if (hadRuntimeError) return;
-
+		
+		interpreter=new Interpreter();
 		interpreter.interpret(statements);
+	}
+	public static void resolve(string source)
+	{
+		/*interpreter = new Interpreter();
+		Scanner scanner = new Scanner(source);
+		List<Token> tokens = scanner.scanTokens();
+
+		Parser parser = new Parser(tokens);
+		List<Stmt> statements = parser.parse();
+		if (hadError) return;
+		
+		///*/
 	}
 
 	public static void error(Token token, string message)
@@ -28,6 +40,10 @@ public static class Compiler
 		if (token.type == TokenType.EOF)
 		{
 			report(token.line, " at end", message);
+		}
+		else if (token.type == TokenType.EOL)
+		{
+			report(token.line, " at end of line", message);
 		}
 		else
 		{
@@ -37,19 +53,18 @@ public static class Compiler
 
 	private static void report(int line, string where, string message)
 	{
-		//TEMPORAL
+
 		GD.Print("[line " + line + "] Error" + where + ": " + message);
-		throw new Exception();
-		//hadError = true;
+		//throw new Exception();
+		hadError = true;
 	}
 
 	public static void runtimeError(RuntimeError error)
 	{
-		//TEMPORAL
 		GD.Print(error.message +
 		"\n[line " + error.token.line + "]");
-		throw new Exception();
-		//hadRuntimeError = true;
+		//throw new Exception();
+		hadRuntimeError = true;
 	}
  
 }

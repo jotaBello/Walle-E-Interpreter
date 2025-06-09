@@ -1,15 +1,47 @@
 {
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
-            "name": "Play",
-            "type": "coreclr",
+            "name": "Play in Editor",
+            "type": "godot-mono",
+            "mode": "playInEditor",
+            "request": "launch"
+        },
+        {
+            "name": "Launch",
+            "type": "godot-mono",
             "request": "launch",
+            "mode": "executable",
             "preLaunchTask": "build",
-            "program": "C:/Users/JOSE/Downloads/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64_console.exe",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "stopAtEntry": false,
+            "executable": "<C:/Users/JOSE/Downloads/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64_console.exe>",
+            "executableArguments": [
+                "--path",
+                "${workspaceRoot}"
+            ]
+        },
+        {
+            "name": "Launch (Select Scene)",
+            "type": "godot-mono",
+            "request": "launch",
+            "mode": "executable",
+            "preLaunchTask": "build",
+            "executable": "<C:/Users/JOSE/Downloads/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64_console.exe>",
+            "executableArguments": [
+                "--path",
+                "${workspaceRoot}",
+                "${command:SelectLaunchScene}"
+            ]
+        },
+        {
+            "name": "Attach",
+            "type": "godot-mono",
+            "request": "attach",
+            "address": "localhost",
+            "port": 23685
         }
     ]
 }

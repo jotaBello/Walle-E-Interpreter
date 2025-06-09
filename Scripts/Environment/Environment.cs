@@ -4,7 +4,8 @@ using System.Collections.Generic;
 public class Environment
 {
 	Environment enclosing;
-	private Dictionary<string, Object> values = new Dictionary<string, Object>();
+	private Dictionary<string, object> variables = new Dictionary<string, object>();
+	private Dictionary<string, int> labels = new Dictionary<string, int>();
 	private Dictionary<string, Dictionary<int, Function>> funGlobal = new Dictionary<string, Dictionary<int, Function>>();
 	private HashSet<(string, int)> builtins = new HashSet<(string, int)>()
   {
@@ -17,6 +18,13 @@ public class Environment
 	("Fill", 0),
 	("rand",2),
 	("GetColor",2),
+	("GetActualX",0),
+	("GetActualY",0),
+	("GetCanvasSize",0),
+	("GetColorCount",5),
+	("IsBrushColor",1),
+	("IsBrushSize",1),	
+	("IsCanvasColor",3),	
   };
 
 	public Environment()
@@ -36,8 +44,7 @@ public class Environment
 		int arity = fun.Arity;
 		if (IsBuiltin(name, arity))
 		{
-			Compiler.runtimeError(new RuntimeError(fun.name, "is a built-in function."));
-			return;
+			throw new RuntimeError(fun.name, "is a built-in function.");
 		}
 
 		if (funGlobal.ContainsKey(name))
@@ -45,8 +52,7 @@ public class Environment
 			Dictionary<int, Function> table = funGlobal[name];
 			if (table.ContainsKey(arity))
 			{
-				Compiler.runtimeError(new RuntimeError(fun.name, "already exists."));
-				return;
+				throw new RuntimeError(fun.name, "already exists.");
 			}
 			else
 			{
@@ -65,13 +71,13 @@ public class Environment
 
 	public void define(String name, Object value)
 	{
-		if (values.ContainsKey(name))
+		if (variables.ContainsKey(name))
 		{
-			values[name] = value;
+			variables[name] = value;
 		}
 		else
 		{
-			values.Add(name, value);
+			variables.Add(name, value);
 		}
 
 		if (enclosing != null)
@@ -79,6 +85,26 @@ public class Environment
 			enclosing.define(name, value);
 			return;
 		}
+	}
+	public void labeldefine(Token name,int index)
+	{
+		if (labels.ContainsKey(name.lexeme))
+		{
+			throw new RuntimeError(name, " label already exists.");
+		}
+		else
+		{
+			labels.Add(name.lexeme,index);
+		}
+	}
+	public int labelget(Token name)
+	{
+		if (!labels.ContainsKey(name.lexeme))
+		{
+			throw new RuntimeError(name, " label does'nt exists.");
+		}
+
+		return labels[name.lexeme];
 	}
 
 	public void assign()
@@ -88,9 +114,9 @@ public class Environment
 
 	public Object get(Token name)
 	{
-		if (values.ContainsKey(name.lexeme))
+		if (variables.ContainsKey(name.lexeme))
 		{
-			return values[name.lexeme];
+			return variables[name.lexeme];
 		}
 		else
 		{

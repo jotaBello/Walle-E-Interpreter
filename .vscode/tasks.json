@@ -3,10 +3,14 @@
     "tasks": [
         {
             "label": "build",
-            "command": "dotnet",
+            "command": "<C:/Users/JOSE/Downloads/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64_console.exe>",
             "type": "process",
             "args": [
-                "build"
+                "--build-solutions",
+                "--path",
+                "${workspaceRoot}",
+                "--no-window",
+                "-q"
             ],
             "problemMatcher": "$msCompile"
         }

@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.223103, 0.223103, 0.223103, 1)
 
-[node name="CodeEdit" type="CodeEdit" parent="." node_paths=PackedStringArray("codeEdit")]
+[node name="CodeEdit" type="CodeEdit" parent="." node_paths=PackedStringArray("codeEdit", "SaveFileDialog", "ImportFileDialog")]
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -34,9 +34,15 @@ offset_bottom = 199.0
 grow_horizontal = 0
 grow_vertical = 2
 placeholder_text = "Code here..."
+highlight_current_line = true
 gutters_draw_line_numbers = true
+indent_automatic = true
+auto_brace_completion_enabled = true
+auto_brace_completion_highlight_matching = true
 script = ExtResource("1_ebmjs")
 codeEdit = NodePath(".")
+SaveFileDialog = NodePath("../SaveFileDialog")
+ImportFileDialog = NodePath("../ImportFileDialog")
 
 [node name="PwCanvas" type="TextureRect" parent="."]
 layout_mode = 1
@@ -50,7 +56,7 @@ offset_bottom = -226.0
 grow_vertical = 2
 script = ExtResource("3_wrm1d")
 
-[node name="Button" type="Button" parent="."]
+[node name="RunButton" type="Button" parent="."]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -62,4 +68,47 @@ offset_bottom = 50.0
 grow_horizontal = 0
 text = "RUN"
 
-[connection signal="pressed" from="Button" to="CodeEdit" method="_on_button_pressed"]
+[node name="SaveButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -158.0
+offset_top = 14.0
+offset_right = -111.0
+offset_bottom = 52.0
+grow_horizontal = 0
+text = "SAVE"
+
+[node name="ImportButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -241.0
+offset_top = 14.0
+offset_right = -194.0
+offset_bottom = 52.0
+grow_horizontal = 0
+text = "IMPORT"
+
+[node name="SaveFileDialog" type="FileDialog" parent="."]
+position = Vector2i(250, 150)
+access = 2
+filters = PackedStringArray("*.pw")
+
+[node name="ImportFileDialog" type="FileDialog" parent="."]
+auto_translate_mode = 1
+title = "Open a File"
+position = Vector2i(250, 150)
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.pw")
+
+[connection signal="text_changed" from="CodeEdit" to="CodeEdit" method="_on_text_changed"]
+[connection signal="pressed" from="RunButton" to="CodeEdit" method="_on_run_button_pressed"]
+[connection signal="pressed" from="SaveButton" to="CodeEdit" method="_on_save_button_pressed"]
+[connection signal="pressed" from="ImportButton" to="CodeEdit" method="_on_import_button_pressed"]
+[connection signal="file_selected" from="SaveFileDialog" to="CodeEdit" method="_on_save_file_dialog_file_selected"]
+[connection signal="file_selected" from="ImportFileDialog" to="CodeEdit" method="_on_import_file_dialog_file_selected"]
