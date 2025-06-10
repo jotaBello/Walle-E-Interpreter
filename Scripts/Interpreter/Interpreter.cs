@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
 using Godot;
-public class Interpreter
+public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 {
-	private Environment environment = new Environment();
+	public Environment environment = new Environment();
 
 	private int current = 0;
 
@@ -17,7 +17,7 @@ public class Interpreter
 
 			for (; current < statements.Count; current++)
 			{
-				if (!Compiler.hadRuntimeError && !(statements[current] is LabelStmt))
+				if (!(statements[current] is LabelStmt))
 				{
 					execute(statements[current]);
 				}
@@ -49,15 +49,15 @@ public class Interpreter
 
 
 
-	public Object visitLiteralExpr(Literal expr)
+	public object visitLiteralExpr(Literal expr)
 	{
 		return expr.value;
 	}
-	public Object visitGroupingExpr(Grouping expr)
+	public object visitGroupingExpr(Grouping expr)
 	{
 		return evaluate(expr.expression);
 	}
-	private Object evaluate(Expr expr)
+	private object evaluate(Expr expr)
 	{
 		return expr.accept(this);
 	}
@@ -70,15 +70,13 @@ public class Interpreter
 
 	public void visitPrintStmt(PrintStmt stmt)
 	{
-		Object value = evaluate(stmt.expression);
-		//TEMPORAL
+		object value = evaluate(stmt.expression);
 		GD.Print(value);
-		//Console.WriteLine(value);
 	}
 
 	public void visitVarStmt(VarStmt stmt)
 	{
-		Object value = null;
+		object value = null;
 
 		if (stmt.expression != null)
 		{
@@ -87,7 +85,7 @@ public class Interpreter
 
 		environment.define(stmt.name.lexeme, value);
 	}
-	public Object visitVariableExpr(Variable expr)
+	public object visitVariableExpr(Variable expr)
 	{
 		return environment.get(expr.name);
 	}
@@ -138,7 +136,7 @@ public class Interpreter
 		}
 	}
 
-	public Object visitCallExpr(Call expr)
+	public object visitCallExpr(Call expr)
 	{
 		if (environment.IsBuiltin(expr.name.lexeme, expr.Arity))
 		{
@@ -182,7 +180,7 @@ public class Interpreter
 					case "rand":
 						checkNumbersInFunctions(expr.name, parameters[0], parameters[1]);
 						Random random = new Random();
-						return random.Next((int)parameters[0], (int)parameters[1]);
+						return random.Next((int)parameters[0], (int)parameters[1] + 1);
 					case "GetColor":
 						checkNumbersInFunctions(expr.name, parameters[0], parameters[1]);
 						return GetColor((int)parameters[0], (int)parameters[1]);
@@ -219,13 +217,13 @@ public class Interpreter
 
 		if (!environment.IsFunction(expr.name))
 		{
-			Compiler.runtimeError(new RuntimeError(expr.name, "Expected function."));
+			Compiler.runtimeError(new RuntimeError(expr.name, $"{expr.name.lexeme} function does'nt exist in this context."));
 			return null;
 		}
 
 		if (!environment.IsFunction(expr.name, expr.Arity))
 		{
-			Compiler.runtimeError(new RuntimeError(expr.name, "incorrect arity for this function."));
+			Compiler.runtimeError(new RuntimeError(expr.name, $"{expr.name.lexeme} function does'nt take {expr.Arity} arguments."));
 			return null;
 		}
 
@@ -253,9 +251,9 @@ public class Interpreter
 	}
 
 
-	public Object visitUnaryExpr(Unary expr)
+	public object visitUnaryExpr(Unary expr)
 	{
-		Object right = evaluate(expr.right);
+		object right = evaluate(expr.right);
 		switch (expr.operation.type)
 		{
 			case TokenType.MINUS:
@@ -268,10 +266,10 @@ public class Interpreter
 		return null;
 	}
 
-	public Object visitBinaryExpr(Binary expr)
+	public object visitBinaryExpr(Binary expr)
 	{
-		Object left = evaluate(expr.left);
-		Object right = evaluate(expr.right);
+		object left = evaluate(expr.left);
+		object right = evaluate(expr.right);
 		switch (expr.operation.type)
 		{
 			case TokenType.GREATER:
@@ -320,7 +318,7 @@ public class Interpreter
 
 
 
-	private bool isEqual(Object a, Object b)
+	private bool isEqual(object a, object b)
 	{
 		if (a == null && b == null) return true;
 		if (a == null || b == null) return false;
@@ -328,41 +326,42 @@ public class Interpreter
 	}
 
 
-	private bool isTruthy(Object objec)
+	private bool isTruthy(object objec)
 	{
 		if (objec == null) return false;
 		if (objec is bool) return (bool)objec;
+		if (objec is int) return (int)objec>0;
 		return true;
 	}
 
-	private void checkNumberOperand(Token operation, Object operand)
+	private void checkNumberOperand(Token operation, object operand)
 	{
 		if (operand is int) return;
 		throw new RuntimeError(operation, "Operand must be a number.");
 	}
-	private void checkNumberOperand(Token operation, Object left, Object right)
+	private void checkNumberOperand(Token operation, object left, object right)
 	{
 		if (left is int && right is int || left is string && right is string) return;
 
 		throw new RuntimeError(operation, "Both operands must be numbers or strings.");
 	}
-	private void checkNumbersInFunctions(Token funName, params Object[] parameters)
+	private void checkNumbersInFunctions(Token funName, params object[] parameters)
 	{
-		foreach (Object obj in parameters)
+		foreach (object obj in parameters)
 			if (!(obj is int))
 				throw new RuntimeError(funName, "Arguments must be numbers.");
 	}
-	private void checkStringInFunctions(Token funName, params Object[] parameters)
+	private void checkStringInFunctions(Token funName, params object[] parameters)
 	{
-		foreach (Object obj in parameters)
+		foreach (object obj in parameters)
 			if (!(obj is string))
 				throw new RuntimeError(funName, "Argument must be string.");
 	}
 
 
-	public Object visitLogicalExpr(Logical expr)
+	public object visitLogicalExpr(Logical expr)
 	{
-		Object left = evaluate(expr.left);
+		object left = evaluate(expr.left);
 		if (expr.operation.type == TokenType.OR)
 		{
 			if (isTruthy(left)) return left;
@@ -389,7 +388,7 @@ public class Interpreter
 
 	public void visitReturnStmt(ReturnStmt stmt)
 	{
-		Object value = null;
+		object value = null;
 		if (stmt.value != null) value = evaluate(stmt.value);
 		throw new Return(value);
 	}

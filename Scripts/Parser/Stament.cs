@@ -5,14 +5,24 @@ using System.Reflection.Emit;
 using Microsoft.CSharp.RuntimeBinder;
 public abstract class Stmt
 {
-	virtual public void accept(Interpreter interpreter)
+	virtual public void accept(Visitor visitor)
 	{
 		//TEMPORAL
 	}
-	/*virtual public void accept(Resolver interpreter)
+
+	public interface Visitor
 	{
-		//TEMPORAL
-	}*/
+		public void visitPrintStmt(PrintStmt stmt);
+		public void visitExpressionStmt(ExpressionStmt stmt);
+		public void visitVarStmt(VarStmt stmt);
+		public void visitBlockStmt(BlockStmt stmt);
+		public void visitIfStmt(IfStmt stmt);
+		public void visitWhileStmt(WhileStmt stmt);
+		public void visitFunctionStmt(Function stmt);
+		public void visitReturnStmt(ReturnStmt stmt);
+		public void visitLabelStmt(LabelStmt stmt);
+		public void visitGoToStmt(GoToStmt stmt);
+	}
 }
 
 public class PrintStmt : Stmt
@@ -23,9 +33,9 @@ public class PrintStmt : Stmt
 	{
 		this.expression = expression;
 	}
-	override public void accept(Interpreter interpreter)
+	override public void accept(Visitor visitor)
 	{
-		interpreter.visitPrintStmt(this);
+		visitor.visitPrintStmt(this);
 	}
 
 }
@@ -37,9 +47,9 @@ public class ExpressionStmt : Stmt
 	{
 		this.expression = expression;
 	}
-	override public void accept(Interpreter interpreter)
+	override public void accept(Visitor visitor)
 	{
-		interpreter.visitExpressionStmt(this);
+		visitor.visitExpressionStmt(this);
 	}
 }
 
@@ -53,9 +63,9 @@ public class VarStmt : Stmt
 		this.expression = expression;
 		this.name = name;
 	}
-	override public void accept(Interpreter interpreter)
+	override public void accept(Visitor visitor)
 	{
-		interpreter.visitVarStmt(this);
+		visitor.visitVarStmt(this);
 	}
 }
 
@@ -67,9 +77,9 @@ public class BlockStmt : Stmt
 	{
 		this.statements = statements;
 	}
-	override public void accept(Interpreter interpreter)
+	override public void accept(Visitor visitor)
 	{
-		interpreter.visitBlockStmt(this);
+		visitor.visitBlockStmt(this);
 	}
 }
 
@@ -86,9 +96,9 @@ public class IfStmt : Stmt
 		this.thenBranch = thenBranch;
 		this.elseBranch = elseBranch;
 	}
-	override public void accept(Interpreter interpreter)
+	override public void accept(Visitor visitor)
 	{
-		interpreter.visitIfStmt(this);
+		visitor.visitIfStmt(this);
 	}
 }
 
@@ -102,9 +112,9 @@ public class WhileStmt : Stmt
 		this.condition = condition;
 		this.body = body;
 	}
-	override public void accept(Interpreter interpreter)
+	override public void accept(Visitor visitor)
 	{
-		interpreter.visitWhileStmt(this);
+		visitor.visitWhileStmt(this);
 	}
 }
 
@@ -130,9 +140,9 @@ public class Function : Stmt
 		this.closure = closure;
 		Arity = parameters.Count;
 	}
-	override public void accept(Interpreter interpreter)
+	override public void accept(Visitor visitor)
 	{
-		interpreter.visitFunctionStmt(this);
+		visitor.visitFunctionStmt(this);
 	}
 }
 public class ReturnStmt : Stmt
@@ -145,9 +155,9 @@ public class ReturnStmt : Stmt
 		this.keyword = keyword;
 		this.value = value;
 	}
-	override public void accept(Interpreter interpreter)
+	override public void accept(Visitor visitor)
 	{
-		interpreter.visitReturnStmt(this);
+		visitor.visitReturnStmt(this);
 	}
 
 }
@@ -160,9 +170,9 @@ public class LabelStmt : Stmt
 	{
 		this.name = name;
 	}
-	override public void accept(Interpreter interpreter)
+	override public void accept(Visitor visitor)
 	{
-		interpreter.visitLabelStmt(this);
+		visitor.visitLabelStmt(this);
 	}
 
 }
@@ -177,9 +187,9 @@ public class GoToStmt : Stmt
 		this.label = label;
 		this.condition = condition;
 	}
-	override public void accept(Interpreter interpreter)
+	override public void accept(Visitor visitor)
 	{
-		interpreter.visitGoToStmt(this);
+		visitor.visitGoToStmt(this);
 	}
 
 }

@@ -44,7 +44,10 @@ public class Scanner
         {"while",TokenType.WHILE},
         {"for",TokenType.FOR},
         {"return",TokenType.RETURN},
-        {"fun",TokenType.FUN}
+        {"fun",TokenType.FUN},
+        {"print",TokenType.PRINT},
+        {"if",TokenType.IF},
+        {"else",TokenType.ELSE}
     };
     
 
@@ -130,7 +133,7 @@ public class Scanner
                 }
                 else
                 {
-                    //Interpreter.error(line, "Unexpected character.");
+                    Compiler.Lexicalerror(c.ToString(),line, "Unexpected character.");
                 }
                 break;
         }
@@ -145,7 +148,7 @@ public class Scanner
         }
         if (isAtEnd())
         {
-            //ERROR
+            Compiler.Lexicalerror("end",line, "Unfinished string.");
             return;
         }
 
@@ -206,22 +209,7 @@ public class Scanner
         {
             type = keywords[text];
         }
-        else if (text == "print")
-        {
-            type = TokenType.PRINT;
-        }
-        else if (text == "if")
-        {
-            type = TokenType.IF;   
-        }
-        else if (text == "else")
-        {
-            type = TokenType.ELSE;   
-        }
-        else if (text == "while")
-        {
-            type = TokenType.WHILE;   
-        }
+
         else
         {
             type = TokenType.IDENTIFIER;

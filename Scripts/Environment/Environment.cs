@@ -7,25 +7,25 @@ public class Environment
 	private Dictionary<string, object> variables = new Dictionary<string, object>();
 	private Dictionary<string, int> labels = new Dictionary<string, int>();
 	private Dictionary<string, Dictionary<int, Function>> funGlobal = new Dictionary<string, Dictionary<int, Function>>();
-	private HashSet<(string, int)> builtins = new HashSet<(string, int)>()
-  {
-	("Spawn", 2),
-	("Color", 1),
-	("Size", 1),
-	("DrawLine", 3),
-	("DrawCircle", 3),
-	("DrawRectangle", 5),
-	("Fill", 0),
-	("rand",2),
-	("GetColor",2),
-	("GetActualX",0),
-	("GetActualY",0),
-	("GetCanvasSize",0),
-	("GetColorCount",5),
-	("IsBrushColor",1),
-	("IsBrushSize",1),	
-	("IsCanvasColor",3),	
-  };
+	private Dictionary<string, int> builtins = new Dictionary<string, int>()
+	{
+		{"Spawn", 2},
+		{"Color", 1 },
+		{"Size", 1 },
+		{"DrawLine", 3 },
+		{"DrawCircle", 3 },
+		{"DrawRectangle", 5 },
+		{"Fill", 0},
+		{"rand",2},
+		{"GetColor",2},
+		{"GetActualX",0},
+		{"GetActualY",0},
+		{"GetCanvasSize",0},
+		{"GetColorCount",5 },
+		{"IsBrushColor",1},
+		{"IsBrushSize",1},	
+		{"IsCanvasColor",3},	
+	};
 
 	public Environment()
 	{
@@ -106,10 +106,9 @@ public class Environment
 
 		return labels[name.lexeme];
 	}
-
-	public void assign()
+	public bool islabel (Token name)
 	{
-
+		return labels.ContainsKey(name.lexeme);
 	}
 
 	public Object get(Token name)
@@ -125,10 +124,14 @@ public class Environment
 
 		throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
 	}
+	public bool isVariable(Token name)
+	{
+		return variables.ContainsKey(name.lexeme);
+	}
 
 	public bool IsFunction(Token name)
 	{
-		if (funGlobal.ContainsKey(name.lexeme))
+		if (funGlobal.ContainsKey(name.lexeme) || builtins.ContainsKey(name.lexeme))
 		{
 			return true;
 		}
@@ -144,16 +147,20 @@ public class Environment
 		{
 			return funGlobal[name.lexeme].ContainsKey(arity);
 		}
+		else if(builtins.ContainsKey(name.lexeme))
+		{
+			return builtins[name.lexeme] == arity;
+		}
 		else if (enclosing != null)
 		{
-			return enclosing.IsFunction(name,arity);
+			return enclosing.IsFunction(name, arity);
 		}
 		return false;
 	}
 
 	public bool IsBuiltin(string name, int arity)
 	{
-		return builtins.Contains((name, arity));
+		return builtins.ContainsKey(name) && builtins[name]==arity ;
 	}
 	public List<Stmt> GetBody(string name, int arity)
 	{

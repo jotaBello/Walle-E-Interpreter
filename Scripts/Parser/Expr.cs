@@ -3,14 +3,23 @@ using System.Collections.Generic;
 
 public abstract class Expr
 {
-	virtual public Object accept(Interpreter interpreter)
+	virtual public Object accept(Visitor<object> visitor)
 	{
-		return this;
+		return null;
 	}
-	/*virtual public Object accept(Resolver interpreter)
+
+	public interface Visitor<T>
 	{
-		return this;
-	}*/
+		public T visitBinaryExpr(Binary expr);
+		public T visitGroupingExpr(Grouping expr);
+		public T visitLiteralExpr(Literal expr);
+		public T visitUnaryExpr(Unary expr);
+		public T visitVariableExpr(Variable expr);
+		public T visitLogicalExpr(Logical xpr);
+		public T visitCallExpr(Call expr);
+	}
+	
+
 }
 public class Binary : Expr
 {
@@ -23,9 +32,9 @@ public class Binary : Expr
 		this.operation = operation;
 		this.right = right;
 	}
-	override public Object accept(Interpreter interpreter)
+	override public Object accept(Visitor<object> visitor)
 	{
-		return interpreter.visitBinaryExpr(this);
+		return visitor.visitBinaryExpr(this);
 	}
 }
 
@@ -36,9 +45,9 @@ public class Grouping : Expr
 	{
 		this.expression = expression;
 	}
-	override public Object accept(Interpreter interpreter)
+	override public Object accept(Visitor<object> visitor)
 	{
-		return interpreter.visitGroupingExpr(this);
+		return visitor.visitGroupingExpr(this);
 	}
 }
 
@@ -49,9 +58,9 @@ public class Literal : Expr
 	{
 		this.value = value;
 	}
-	override public Object accept(Interpreter interpreter)
+	override public Object accept(Visitor<object> visitor)
 	{
-		return interpreter.visitLiteralExpr(this);
+		return visitor.visitLiteralExpr(this);
 	}
 }
 
@@ -64,9 +73,9 @@ public class Unary : Expr
 		this.operation = operation;
 		this.right = right;
 	}
-	override public Object accept(Interpreter interpreter)
+	override public Object accept(Visitor<object> visitor)
 	{
-		return interpreter.visitUnaryExpr(this);
+		return visitor.visitUnaryExpr(this);
 	}
 }
 
@@ -77,9 +86,9 @@ public class Variable : Expr
 	{
 		this.name = name;
 	}
-	override public Object accept(Interpreter interpreter)
+	override public Object accept(Visitor<object> visitor)
 	{
-		return interpreter.visitVariableExpr(this);
+		return visitor.visitVariableExpr(this);
 	}
 }
 
@@ -95,9 +104,9 @@ public class Logical : Expr
 		this.operation = operation;
 		this.right = right;
 	}
-	override public Object accept(Interpreter interpreter)
+	override public Object accept(Visitor<object> visitor)
 	{
-		return interpreter.visitLogicalExpr(this);
+		return visitor.visitLogicalExpr(this);
 	}
 }
 
@@ -115,8 +124,8 @@ public class Call : Expr
 		this.parameters = arguments;
 		Arity=arguments.Count;
 	}
-	override public Object accept(Interpreter interpreter)
+	override public Object accept(Visitor<object> visitor)
 	{
-		return interpreter.visitCallExpr(this);
+		return visitor.visitCallExpr(this);
 	}
 }

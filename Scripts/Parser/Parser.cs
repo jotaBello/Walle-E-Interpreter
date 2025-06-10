@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 
 using Microsoft.CSharp.RuntimeBinder;
 public class Parser
@@ -39,14 +40,14 @@ public class Parser
 	private Stmt printStatement()
 	{
 		Expr value = expression();
-		consume("Expect EOL or EOF after value.", TokenType.EOL, TokenType.EOF);
+		consume("Expect EOL after value.", TokenType.EOL);
 		return new PrintStmt(value);
 	}
 
 	private Stmt expressionStatement()
 	{
 		Expr expr = expression();
-		consume("Expect EOL or EOF after expression.", TokenType.EOL, TokenType.EOF);
+		consume("Expect EOL after expression.", TokenType.EOL);
 
 		return new ExpressionStmt(expr);
 	}
@@ -60,14 +61,14 @@ public class Parser
 
 		initializer = expression();
 
-		consume("Expect EOL or EOF after variable declaration.", TokenType.EOL, TokenType.EOF);
+		consume("Expect EOL after variable declaration.", TokenType.EOL);
 		return new VarStmt(name, initializer);
 	}
 	private Stmt labelDeclaration()
 	{
 		Back();Back();
 		Token name = consume(TokenType.IDENTIFIER, "Expect label name.");
-		consume("Expect EOL or EOF after label declaration.", TokenType.EOL, TokenType.EOF);
+		consume("Expect EOL after label declaration.", TokenType.EOL);
 		return new LabelStmt(name);
 	}
 	private Stmt For_varDeclaration()
@@ -86,7 +87,7 @@ public class Parser
 	{
 		try
 		{
-			if (match(TokenType.FUN)) return function("function");
+			if (match(TokenType.FUN)) return function();
 			if (match(TokenType.IDENTIFIER))
 			{
 				if (match(TokenType.VAR))
@@ -119,15 +120,14 @@ public class Parser
 		}
 		catch (ParseError)
 		{
-			synchronize();
 			return null;
 		}
 	}
 
-	private Function function(String kind)
+	private Function function()
 	{
 		Token name=consume(TokenType.IDENTIFIER, " Expected function name");
-		consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
+		consume(TokenType.LEFT_PAREN, "Expect '(' after function name.");
 		List<Token> parameters = new List<Token>();
 		if (!check(TokenType.RIGHT_PAREN))
 		{
@@ -144,7 +144,7 @@ public class Parser
 		consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
 
 		SkipEOL();
-		consume(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
+		consume(TokenType.LEFT_BRACE, "Expect '{' before function body.");
 		List<Stmt> body = block();
 		return new Function(name, parameters, body);
  
@@ -274,32 +274,9 @@ public class Parser
 
 
 
-
-
-
-
 	private Expr expression()
 	{
-		return assignment();
-	}
-
-	private Expr assignment() {
-
-		Expr expr = or();
-		
-		/*if (match(TokenType.VAR))
-		{
-			Token var = previous();
-			Expr value = assignment();
-			if (expr is Variable)
-			{
-				Token name = ((Variable)expr).name;
-				//TEMPORAL
-				return new Variable(name);
-			}
-			error(var, "Invalid assignment target.");
-		}*/
-		return expr;
+		return or();
 	}
 	
 	private Expr or()
@@ -398,10 +375,8 @@ public class Parser
 				return finishCall(name);
 			}
 		}
-		else return primary();
 
-		//unreachable
-		return null;
+		return primary();
 	}
 	private Expr finishCall(Token name)
 	{
@@ -457,7 +432,7 @@ public class Parser
 			switch (peek().type)
 			{
 				case TokenType.FUN:
-				case TokenType.VAR:
+				case TokenType.IDENTIFIER:
 				case TokenType.FOR:
 				case TokenType.IF:
 				case TokenType.WHILE:
@@ -473,9 +448,6 @@ public class Parser
 	{
 		while(match(TokenType.EOL)){};
 	}
-
-
-
 
 
 
@@ -509,7 +481,7 @@ public class Parser
 
 	private ParseError error(Token token, string message)
 	{
-		Compiler.error(token, message);
+		Compiler.SyntacticError(token, message);
 		return new ParseError();
 	}
 

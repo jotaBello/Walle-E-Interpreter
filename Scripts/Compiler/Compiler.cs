@@ -19,50 +19,74 @@ public static class Compiler
 		List<Stmt> statements = parser.parse();
 		if (hadError) return;
 		
-		interpreter=new Interpreter();
+		Resolver resolver = new Resolver(interpreter);
+		resolver.resolve(statements);
+		if (hadError) return;
+		
+		interpreter =new Interpreter();
 		interpreter.interpret(statements);
 	}
 	public static void resolve(string source)
 	{
-		/*interpreter = new Interpreter();
+		interpreter = new Interpreter();
 		Scanner scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
+		if (hadError) return;
 
 		Parser parser = new Parser(tokens);
 		List<Stmt> statements = parser.parse();
 		if (hadError) return;
-		
-		///*/
-	}
 
-	public static void error(Token token, string message)
+		Resolver resolver = new Resolver(interpreter);
+		resolver.resolveLabels(statements);
+		resolver.resolve(statements);
+	}
+	public static void Lexicalerror(string c,int line, string message)
 	{
-		if (token.type == TokenType.EOF)
+		if (c.Length == 1)
 		{
-			report(token.line, " at end", message);
-		}
-		else if (token.type == TokenType.EOL)
-		{
-			report(token.line, " at end of line", message);
+			report(line, $" at '{c}'","Lexical", message);
 		}
 		else
 		{
-			report(token.line, " at '" + token.lexeme + "'", message);
+			report(line, $" at {c}", "Lexical", message);
 		}
 	}
 
-	private static void report(int line, string where, string message)
+	public static void SyntacticError(Token token, string message)
+	{
+		if (token.type == TokenType.EOL)
+		{
+			report(token.line, " at end of line", "Syntactic",message);
+		}
+		else
+		{
+			report(token.line, " at '" + token.lexeme + "'", "Syntactic",message);
+		}
+	}
+	public static void SemanticError(Token token, string message)
+	{
+		if (token.type == TokenType.EOL)
+		{
+			report(token.line, " at end of line", "Semantic", message);
+		}
+		else
+		{
+			report(token.line, " at '" + token.lexeme + "'", "Semantic", message);
+		}
+	}
+
+	private static void report(int line, string where, string errorType, string message)
 	{
 
-		GD.Print("[line " + line + "] Error" + where + ": " + message);
+		GD.Print("[line " + line + "] " + errorType + " error" + where + ": " + message);
 		//throw new Exception();
 		hadError = true;
 	}
 
 	public static void runtimeError(RuntimeError error)
 	{
-		GD.Print(error.message +
-		"\n[line " + error.token.line + "]");
+		report(error.token.line,"","Runtime",error.message);
 		//throw new Exception();
 		hadRuntimeError = true;
 	}

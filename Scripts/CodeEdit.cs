@@ -30,6 +30,7 @@ public partial class CodeEdit : Godot.CodeEdit
 
 	public void _on_text_changed()
 	{
+		Compiler.hadError = false;
 		Compiler.resolve(codeEdit.Text);
 	}
 
