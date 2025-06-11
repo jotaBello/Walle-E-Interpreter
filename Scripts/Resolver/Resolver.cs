@@ -73,7 +73,9 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 		{
 			if (expr.operation.type == TokenType.PLUS)
 			{
-				if (((Literal)expr.left).value.GetType != ((Literal)expr.right).value.GetType)
+				object newL = ((Literal)expr.left).value; object newR = ((Literal)expr.right).value;
+
+				if (newL is int && !(newR is int) || !(newL is int) && newR is int)
 				{
 					error(expr.operation, "Both operands must be numbers or strings.");
 				}
@@ -148,7 +150,93 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 			error(expr.name, $"This function does'nt take {expr.Arity} arguments.");
 			return null;
 		}
+		if (interpreter.environment.IsBuiltin(expr.name.lexeme, expr.Arity))
+		{
+			List<Expr> parameters = expr.parameters;
+			switch (expr.name.lexeme)
+			{
+				case "Spawn":
+					ResolveNumbersInFunctions(expr.name, parameters[0], parameters[1]);
+					break;
+				case "Color":
+					ResolveStringInFunctions(expr.name, parameters[0]);
+					break;
+				case "Size":
+					ResolveNumbersInFunctions(expr.name, parameters[0]);
+					break;
+				case "DrawLine":
+					ResolveNumbersInFunctions(expr.name, parameters[0], parameters[1], parameters[2]);
+					break;
+				case "DrawCircle":
+					ResolveNumbersInFunctions(expr.name, parameters[0], parameters[1], parameters[2]);
+					break;
+				case "DrawRectangle":
+					ResolveNumbersInFunctions(expr.name, parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+					break;
+				case "Fill":
+					break;
+				case "rand":
+					ResolveNumbersInFunctions(expr.name, parameters[0], parameters[1]);
+					break;
+				case "GetColor":
+					ResolveNumbersInFunctions(expr.name, parameters[0], parameters[1]);
+					break;
+				case "GetActualX":
+					break;
+				case "GetActualY":
+					break;
+				case "GetCanvasSize":
+					break;
+				case "GetColorCount":
+					ResolveStringInFunctions(expr.name, parameters[0]);
+					ResolveNumbersInFunctions(expr.name, parameters[1], parameters[2], parameters[3], parameters[4]);
+					break;
+				case "IsBrushColor":
+					ResolveStringInFunctions(expr.name, parameters[0]);
+					break;
+				case "IsBrushSize":
+					ResolveNumbersInFunctions(expr.name, parameters[0]);
+					break;
+				case "IsCanvasColor":
+					ResolveStringInFunctions(expr.name, parameters[0]);
+					ResolveNumbersInFunctions(expr.name, parameters[1], parameters[2]);
+					break;
+				default:
+					throw new NotImplementedException();
+			}
+		}
+		foreach (var par in expr.parameters)
+		{
+			resolve(par);
+		}
 		return null;
+	}
+	
+	private void ResolveStringInFunctions(Token funName, params Expr[] parameters)
+	{
+		foreach (var par in parameters)
+		{
+			if (par is Literal)
+			{
+				if (!(((Literal)par).value is string))
+				{
+					error(funName, "Argument must be string.");
+				}
+			}
+		}
+	}
+	private void ResolveNumbersInFunctions(Token funName, params object[] parameters)
+	{
+		foreach (var par in parameters)
+		{
+			if (par is Literal)
+			{
+				if (!(((Literal)par).value is int))
+				{
+					error(funName, "Arguments must be numbers.");
+				}
+			}
+		}
 	}
 	
 

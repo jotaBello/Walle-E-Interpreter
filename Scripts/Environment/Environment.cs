@@ -174,7 +174,7 @@ public class Environment
 		if (funGlobal.ContainsKey(name) && funGlobal[name].ContainsKey(arity))
 			return funGlobal[name][arity].parameters;
 		else
-			return enclosing.GetParameters(name, arity);
+				return enclosing.GetParameters(name, arity);
 	}
 	public Environment GetClosure(string name, int arity)
 	{

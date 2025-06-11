@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://b73lgiqugdsew"]
+[gd_scene load_steps=4 format=3 uid="uid://b73lgiqugdsew"]
 
 [ext_resource type="Script" uid="uid://drtni40regruy" path="res://Scripts/CodeEdit.cs" id="1_ebmjs"]
+[ext_resource type="Script" uid="uid://dlr8ch5pg7jhx" path="res://Scripts/Log.cs" id="3_3dryh"]
 [ext_resource type="Script" uid="uid://bd38g31btn5k0" path="res://Scripts/PwCanvas.cs" id="3_wrm1d"]
 
 [node name="Interfaz" type="Control"]
@@ -28,9 +29,9 @@ anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
 offset_left = -600.0
-offset_top = -215.0
+offset_top = -300.0
 offset_right = -23.0
-offset_bottom = 199.0
+offset_bottom = 114.0
 grow_horizontal = 0
 grow_vertical = 2
 placeholder_text = "Code here..."
@@ -61,9 +62,9 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -69.0
+offset_left = -781.0
 offset_top = 12.0
-offset_right = -22.0
+offset_right = -734.0
 offset_bottom = 50.0
 grow_horizontal = 0
 text = "RUN"
@@ -73,10 +74,10 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -158.0
-offset_top = 14.0
-offset_right = -111.0
-offset_bottom = 52.0
+offset_left = -860.0
+offset_top = 19.0
+offset_right = -813.0
+offset_bottom = 57.0
 grow_horizontal = 0
 text = "SAVE"
 
@@ -85,10 +86,10 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -241.0
-offset_top = 14.0
-offset_right = -194.0
-offset_bottom = 52.0
+offset_left = -960.0
+offset_top = 19.0
+offset_right = -890.0
+offset_bottom = 57.0
 grow_horizontal = 0
 text = "IMPORT"
 
@@ -105,6 +106,16 @@ ok_button_text = "Open"
 file_mode = 0
 access = 2
 filters = PackedStringArray("*.pw")
+
+[node name="TextEdit" type="TextEdit" parent="." node_paths=PackedStringArray("textEdit")]
+layout_mode = 0
+offset_left = 551.0
+offset_top = 454.0
+offset_right = 1129.0
+offset_bottom = 597.0
+editable = false
+script = ExtResource("3_3dryh")
+textEdit = NodePath(".")
 
 [connection signal="text_changed" from="CodeEdit" to="CodeEdit" method="_on_text_changed"]
 [connection signal="pressed" from="RunButton" to="CodeEdit" method="_on_run_button_pressed"]

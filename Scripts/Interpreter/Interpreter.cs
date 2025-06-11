@@ -12,7 +12,6 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	{
 		try
 		{
-			ResolveLabels(statements);
 			current = 0;
 
 			for (; current < statements.Count; current++)
@@ -35,19 +34,7 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 		stmt.accept(this);
 	}
 
-	void ResolveLabels(List<Stmt> stmts)
-	{
-		for (; current < stmts.Count; current++)
-			{
-				if (stmts[current] is LabelStmt)
-				{
-					stmts[current].accept(this);
-				}
-			}
-	}
-
-
-
+	
 
 	public object visitLiteralExpr(Literal expr)
 	{
@@ -140,6 +127,7 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	{
 		if (environment.IsBuiltin(expr.name.lexeme, expr.Arity))
 		{
+			GD.Print("is builtin");
 			List<object> parameters = new List<object>();
 			foreach (var param in expr.parameters)
 			{
@@ -213,6 +201,8 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 			{
 				Compiler.runtimeError(new RuntimeError(expr.name, error.message));
 			}
+
+			return null;
 		}
 
 		if (!environment.IsFunction(expr.name))

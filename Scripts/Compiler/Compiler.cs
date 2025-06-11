@@ -7,39 +7,52 @@ public static class Compiler
 	private static Interpreter interpreter;
 	public static bool hadError = false;
 	public static bool hadRuntimeError = false;
+	private static List<string> errors = new List<string>();
 
 
 	public static void run(string source)
 	{
-		Scanner scanner = new Scanner(source);
-		List<Token> tokens = scanner.scanTokens();
-		if (hadError) return;
-
-		Parser parser = new Parser(tokens);
-		List<Stmt> statements = parser.parse();
-		if (hadError) return;
-		
-		Resolver resolver = new Resolver(interpreter);
-		resolver.resolve(statements);
-		if (hadError) return;
-		
-		interpreter =new Interpreter();
-		interpreter.interpret(statements);
-	}
-	public static void resolve(string source)
-	{
+		errors = new List<string>();
 		interpreter = new Interpreter();
+
 		Scanner scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
+		LogReporter.LogMessages(errors);
 		if (hadError) return;
 
 		Parser parser = new Parser(tokens);
 		List<Stmt> statements = parser.parse();
+		LogReporter.LogMessages(errors);
 		if (hadError) return;
 
 		Resolver resolver = new Resolver(interpreter);
 		resolver.resolveLabels(statements);
 		resolver.resolve(statements);
+		LogReporter.LogMessages(errors);
+		if (hadError) return;
+
+		interpreter.interpret(statements);
+		LogReporter.LogMessages(errors);
+	}
+	public static void resolve(string source)
+	{
+		errors = new List<string>();
+
+		interpreter = new Interpreter();
+		Scanner scanner = new Scanner(source);
+		List<Token> tokens = scanner.scanTokens();
+		LogReporter.LogMessages(errors);
+		if (hadError) return;
+
+		Parser parser = new Parser(tokens);
+		List<Stmt> statements = parser.parse();
+		LogReporter.LogMessages(errors);
+		if (hadError) return;
+
+		Resolver resolver = new Resolver(interpreter);
+		resolver.resolveLabels(statements);
+		resolver.resolve(statements);
+		LogReporter.LogMessages(errors);
 	}
 	public static void Lexicalerror(string c,int line, string message)
 	{
@@ -79,7 +92,7 @@ public static class Compiler
 	private static void report(int line, string where, string errorType, string message)
 	{
 
-		GD.Print("[line " + line + "] " + errorType + " error" + where + ": " + message);
+		errors.Add("[line " + line + "] " + errorType + " error" + where + ": " + message);
 		//throw new Exception();
 		hadError = true;
 	}
