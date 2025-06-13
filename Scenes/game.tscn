@@ -1,8 +1,13 @@
-[gd_scene load_steps=4 format=3 uid="uid://b73lgiqugdsew"]
+[gd_scene load_steps=7 format=3 uid="uid://b73lgiqugdsew"]
 
+[ext_resource type="FontFile" uid="uid://6x7ybvm0i1rp" path="res://Fonts/JetBrains Fonts/JetBrainsMono-Regular.ttf" id="1_3dryh"]
 [ext_resource type="Script" uid="uid://drtni40regruy" path="res://Scripts/CodeEdit.cs" id="1_ebmjs"]
 [ext_resource type="Script" uid="uid://dlr8ch5pg7jhx" path="res://Scripts/Log.cs" id="3_3dryh"]
 [ext_resource type="Script" uid="uid://bd38g31btn5k0" path="res://Scripts/PwCanvas.cs" id="3_wrm1d"]
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_wrm1d"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_3dryh"]
 
 [node name="Interfaz" type="Control"]
 layout_mode = 3
@@ -12,7 +17,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="BackGround" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,7 +26,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.223103, 0.223103, 0.223103, 1)
 
-[node name="CodeEdit" type="CodeEdit" parent="." node_paths=PackedStringArray("codeEdit", "SaveFileDialog", "ImportFileDialog")]
+[node name="CodeEdit" type="CodeEdit" parent="." node_paths=PackedStringArray("codeEdit", "ConsoleLog", "SaveFileDialog", "ImportFileDialog")]
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -34,7 +39,14 @@ offset_right = -23.0
 offset_bottom = 114.0
 grow_horizontal = 0
 grow_vertical = 2
+theme_override_colors/current_line_color = Color(1, 1, 1, 0.0392157)
+theme_override_colors/background_color = Color(0.103744, 0.103744, 0.103744, 1)
+theme_override_fonts/font = ExtResource("1_3dryh")
+theme_override_font_sizes/font_size = 16
 placeholder_text = "Code here..."
+minimap_draw = true
+syntax_highlighter = SubResource("CodeHighlighter_wrm1d")
+highlight_all_occurrences = true
 highlight_current_line = true
 gutters_draw_line_numbers = true
 indent_automatic = true
@@ -42,6 +54,7 @@ auto_brace_completion_enabled = true
 auto_brace_completion_highlight_matching = true
 script = ExtResource("1_ebmjs")
 codeEdit = NodePath(".")
+ConsoleLog = NodePath("../ConsoleLog")
 SaveFileDialog = NodePath("../SaveFileDialog")
 ImportFileDialog = NodePath("../ImportFileDialog")
 
@@ -52,9 +65,10 @@ anchor_top = 0.5
 anchor_bottom = 0.5
 offset_left = 31.0
 offset_top = -258.0
-offset_right = 63.0
-offset_bottom = -226.0
+offset_right = 62.0
+offset_bottom = -227.0
 grow_vertical = 2
+texture = SubResource("ImageTexture_3dryh")
 script = ExtResource("3_wrm1d")
 
 [node name="RunButton" type="Button" parent="."]
@@ -107,12 +121,14 @@ file_mode = 0
 access = 2
 filters = PackedStringArray("*.pw")
 
-[node name="TextEdit" type="TextEdit" parent="." node_paths=PackedStringArray("textEdit")]
+[node name="ConsoleLog" type="TextEdit" parent="." node_paths=PackedStringArray("textEdit")]
 layout_mode = 0
 offset_left = 551.0
 offset_top = 454.0
 offset_right = 1129.0
 offset_bottom = 597.0
+theme_override_colors/background_color = Color(0.101961, 0.101961, 0.101961, 1)
+theme_override_constants/line_spacing = 5
 editable = false
 script = ExtResource("3_3dryh")
 textEdit = NodePath(".")

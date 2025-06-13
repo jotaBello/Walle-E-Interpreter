@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Godot;
 
 public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 {
@@ -20,22 +19,58 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 		for (; current < stmts.Count; current++)
 		{
 			if (stmts[current] is LabelStmt)
+			{
 				resolve(stmts[current]);
+				visitLabelBody((LabelStmt)stmts[current]);
+			}
 		}
 		current = 0;
+	}
+
+	public void Resolve(List<Stmt> stmts)
+	{
+		beginScope();
+		resolveLabels(stmts);
+		resolveSpawn(stmts);
+		
+		
+		for (; current < stmts.Count; current++)
+		{
+			if (!(stmts[current] is LabelStmt))
+				resolve(stmts[current]);
+		}
+		endScope();
+	}
+	public void resolveSpawn(List<Stmt> stmts)
+	{
+		if (stmts.Count > 0)
+		{
+			Stmt stmt = stmts[0];
+			if (stmt is ExpressionStmt)
+			{
+				Expr expr = ((ExpressionStmt)stmt).expression;
+				if (expr is Call)
+				{
+					Token name = ((Call)expr).name;
+					if (name.lexeme == "Spawn")
+					{
+						return;
+					}
+				}
+			}
+			error(new Token(TokenType.IDENTIFIER,"begin", null,0), "Walle_E must be spawned first");
+		}
 	}
 
 
 
 	public void resolve(List<Stmt> stmts)
 	{
-		beginScope();
 		for (; current < stmts.Count; current++)
 		{
 			if(!(stmts[current] is LabelStmt))
 			resolve(stmts[current]);
 		}
-		endScope();
 	}
 	private void resolve(Stmt stmt)
 	{
@@ -139,17 +174,24 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 	}
 	public object visitCallExpr(Call expr)
 	{
-		if (!interpreter.environment.IsFunction(expr.name))
+		bool IsFunction = false; bool IsFunctionA = false;
+		for (int i = scopes.Count - 1; i >= 0; i--)
 		{
-			error(expr.name, $"This function does'nt exist in this context.");
-			return null;
+			if (scopes.ElementAt(i).IsFunction(expr.name))
+			{
+				IsFunction = true;
+			}
+
+			if (scopes.ElementAt(i).IsFunction(expr.name, expr.Arity))
+			{
+				IsFunctionA = true;
+			}
 		}
 
-		if (!interpreter.environment.IsFunction(expr.name, expr.Arity))
-		{
-			error(expr.name, $"This function does'nt take {expr.Arity} arguments.");
-			return null;
-		}
+		if (!IsFunction) error(expr.name, $"This function does'nt exist in this context.");
+		else if (!IsFunctionA) error(expr.name, $"This function does'nt take {expr.Arity} arguments.");
+
+
 		if (interpreter.environment.IsBuiltin(expr.name.lexeme, expr.Arity))
 		{
 			List<Expr> parameters = expr.parameters;
@@ -200,6 +242,9 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 				case "IsCanvasColor":
 					ResolveStringInFunctions(expr.name, parameters[0]);
 					ResolveNumbersInFunctions(expr.name, parameters[1], parameters[2]);
+					break;
+				case "Move":
+					ResolveNumbersInFunctions(expr.name, parameters[0], parameters[1]);
 					break;
 				default:
 					throw new NotImplementedException();
@@ -273,13 +318,39 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 	}
 	public void visitBlockStmt(BlockStmt stmt)
 	{
-		resolve(stmt.statements);
+		beginScope();
+		int temp = current;
+		current = 0;
+		resolveLabelsBody(stmt);
+
+		foreach (var s in stmt.statements)
+		{
+			if (!(s is LabelStmt))
+			{
+				resolve(s);
+			}
+		}
+		current = temp;
+		
+		endScope();
 	}
+	void resolveLabelsBody(BlockStmt stmt)
+	{
+		foreach (var stm in stmt.statements)
+		{
+			if (stm is LabelStmt)
+			{
+				visitLabelBody((LabelStmt)stm);
+			}
+		}
+	}
+
+
 	public void visitIfStmt(IfStmt stmt)
 	{
 		resolve(stmt.condition);
 		resolve(stmt.condition);
-		if (stmt.elseBranch != null) resolve(stmt.elseBranch);    
+		if (stmt.elseBranch != null) resolve(stmt.elseBranch);
 	}
 	public void visitWhileStmt(WhileStmt stmt)
 	{
@@ -315,17 +386,27 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 		stmt.index = current;
 		if (interpreter.environment.islabel(stmt.name))
 		{
-			error(stmt.name, "label already exist");
+			error(stmt.name, "label already exist in this context");
 		}
 		else
 		interpreter.environment.labeldefine(stmt.name,stmt.index);
 	}
+	public void visitLabelBody(LabelStmt stmt)
+	{
+		stmt.index = current;
+		if (scopes.Peek().islabel(stmt.name))
+		{
+			error(stmt.name, "label already exist in this context");
+		}
+		else
+		scopes.Peek().labeldefine(stmt.name,stmt.index);
+	}
 	public void visitGoToStmt(GoToStmt stmt)
 	{
 		resolve(stmt.condition);
-		if (!interpreter.environment.islabel(stmt.label))
+		if (!scopes.Peek().islabel(stmt.label))
 		{
-			error(stmt.label, "label does'nt exist");
+			error(stmt.label, "label does'nt exist in this context");
 		}
 	}
 }

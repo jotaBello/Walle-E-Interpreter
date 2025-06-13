@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.CSharp.RuntimeBinder;
-using Godot;
 public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 {
 	public Environment environment = new Environment();
@@ -34,7 +32,7 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 		stmt.accept(this);
 	}
 
-	
+
 
 	public object visitLiteralExpr(Literal expr)
 	{
@@ -48,8 +46,6 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	{
 		return expr.accept(this);
 	}
-
-
 	public void visitExpressionStmt(ExpressionStmt stmt)
 	{
 		evaluate(stmt.expression);
@@ -58,7 +54,7 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	public void visitPrintStmt(PrintStmt stmt)
 	{
 		object value = evaluate(stmt.expression);
-		GD.Print(value);
+		LogReporter.LogMessage(value.ToString());
 	}
 
 	public void visitVarStmt(VarStmt stmt)
@@ -84,7 +80,7 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	public void visitLabelStmt(LabelStmt stmt)
 	{
 		stmt.index = current;
-		environment.labeldefine(stmt.name,stmt.index);
+		environment.labeldefine(stmt.name, stmt.index);
 	}
 	public void visitGoToStmt(GoToStmt stmt)
 	{
@@ -96,18 +92,41 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 
 	public void executeBlock(List<Stmt> statements, Environment environment)
 	{
+		int temp = current;
 		Environment previous = this.environment;
 		try
 		{
 			this.environment = environment;
-			foreach (Stmt statement in statements)
+
+			
+			current = 0;
+			ResolveLabels(statements);
+
+			for (; current < statements.Count; current++)
 			{
-				execute(statement);
+				if (!(statements[current] is LabelStmt))
+				{
+					execute(statements[current]);
+				}
 			}
+
+			current = temp;
 		}
 		finally
 		{
+			current = temp;
 			this.environment = previous;
+		}
+	}
+
+	public void ResolveLabels(List<Stmt> stmts)
+	{
+		foreach (var stmt in stmts)
+		{
+			if (stmt is LabelStmt)
+			{
+				execute(stmt);
+			}
 		}
 	}
 
@@ -127,7 +146,6 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	{
 		if (environment.IsBuiltin(expr.name.lexeme, expr.Arity))
 		{
-			GD.Print("is builtin");
 			List<object> parameters = new List<object>();
 			foreach (var param in expr.parameters)
 			{
@@ -192,6 +210,10 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 						checkStringInFunctions(expr.name, parameters[0]);
 						checkNumbersInFunctions(expr.name, parameters[1], parameters[2]);
 						return IsCanvasColor((string)parameters[0], (int)parameters[1], (int)parameters[2]);
+					case "Move":
+						checkNumbersInFunctions(expr.name, parameters[0], parameters[1]);
+						Move((int)parameters[0], (int)parameters[1]);
+						break;
 					default:
 						throw new NotImplementedException();
 				}
@@ -320,7 +342,7 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	{
 		if (objec == null) return false;
 		if (objec is bool) return (bool)objec;
-		if (objec is int) return (int)objec>0;
+		if (objec is int) return (int)objec > 0;
 		return true;
 	}
 
@@ -442,7 +464,11 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	}
 	public static int IsCanvasColor(string color, int vertical, int horizontal)
 	{
-		return Paint.IsCanvasColor(color,vertical,horizontal);
+		return Paint.IsCanvasColor(color, vertical, horizontal);
+	}
+	public static void Move(int x, int y)
+	{
+		Paint.Move(x,y);
 	}
 	
  

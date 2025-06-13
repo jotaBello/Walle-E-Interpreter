@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Godot;
 
 public static class Compiler
 {
@@ -12,47 +10,40 @@ public static class Compiler
 
 	public static void run(string source)
 	{
+		LogReporter.CleanLog();
 		errors = new List<string>();
 		interpreter = new Interpreter();
 
 		Scanner scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
-		LogReporter.LogMessages(errors);
 		if (hadError) return;
 
 		Parser parser = new Parser(tokens);
 		List<Stmt> statements = parser.parse();
-		LogReporter.LogMessages(errors);
 		if (hadError) return;
 
 		Resolver resolver = new Resolver(interpreter);
-		resolver.resolveLabels(statements);
-		resolver.resolve(statements);
-		LogReporter.LogMessages(errors);
+		resolver.Resolve(statements);
 		if (hadError) return;
 
 		interpreter.interpret(statements);
-		LogReporter.LogMessages(errors);
 	}
 	public static void resolve(string source)
 	{
+		LogReporter.CleanLog();
 		errors = new List<string>();
 
 		interpreter = new Interpreter();
 		Scanner scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
-		LogReporter.LogMessages(errors);
 		if (hadError) return;
 
 		Parser parser = new Parser(tokens);
 		List<Stmt> statements = parser.parse();
-		LogReporter.LogMessages(errors);
 		if (hadError) return;
 
 		Resolver resolver = new Resolver(interpreter);
-		resolver.resolveLabels(statements);
-		resolver.resolve(statements);
-		LogReporter.LogMessages(errors);
+		resolver.Resolve(statements);
 	}
 	public static void Lexicalerror(string c,int line, string message)
 	{
@@ -92,7 +83,7 @@ public static class Compiler
 	private static void report(int line, string where, string errorType, string message)
 	{
 
-		errors.Add("[line " + line + "] " + errorType + " error" + where + ": " + message);
+		LogReporter.LogMessage("[line " + line + "] " + errorType + " error" + where + ": " + message);
 		//throw new Exception();
 		hadError = true;
 	}
@@ -100,8 +91,9 @@ public static class Compiler
 	public static void runtimeError(RuntimeError error)
 	{
 		report(error.token.line,"","Runtime",error.message);
-		//throw new Exception();
 		hadRuntimeError = true;
+		//throw new Exception();
+		
 	}
  
 }

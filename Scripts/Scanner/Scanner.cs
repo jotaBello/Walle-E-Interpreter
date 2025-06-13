@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 public class Scanner
 {
@@ -68,8 +67,22 @@ public class Scanner
             case '-': addToken(TokenType.MINUS); break;
             case '+': addToken(TokenType.PLUS); break;
             case ';': addToken(TokenType.SEMICOLON); break;
-            case '/': addToken(TokenType.SLASH); break;
             case '%': addToken(TokenType.MOD); break;
+            case '/':
+                if (match('/'))
+                {
+                    while (peek() != '\n' && !isAtEnd()) advance();
+                }
+                else if (match('*'))
+                {
+                    while (!isAtEnd() && !(peek() == '*' && Nextpeek() == '/')) advance();
+                    if (!isAtEnd()) { advance(); advance(); }
+                }
+                    else
+                    {
+                        addToken(TokenType.SLASH);
+                    }
+                    break;
 
             case '*':
                 addToken(match('*') ? TokenType.POW : TokenType.STAR);
@@ -199,11 +212,16 @@ public class Scanner
         if (current >= source.Length) return '\0';
         return source[current];
     }
+    private char Nextpeek()
+    {
+        if (current >= source.Length-1) return '\0';
+        return source[current+1];
+    }
 
     private void identifier()
     {
         while (isAlphaNumeric(peek())) advance();
-        string text = source.Substring(start, current-start);
+        string text = source.Substring(start, current - start);
         TokenType type;
         if (keywords.ContainsKey(text))
         {
@@ -214,7 +232,7 @@ public class Scanner
         {
             type = TokenType.IDENTIFIER;
         }
-        
+
         addToken(type);
     }
 

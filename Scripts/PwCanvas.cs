@@ -1,6 +1,4 @@
 using Godot;
-using System;
-
 public partial class PwCanvas : TextureRect
 {
 	[Export] public int CanvasWidth = 31;

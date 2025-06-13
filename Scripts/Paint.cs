@@ -1,9 +1,6 @@
 using Godot;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-
 public enum PwColor
 {	
 	White,
@@ -124,12 +121,13 @@ public static class Paint
 
 			while (isOnTheBounds(newX, newy) && distance > 0)
 			{
+				MoveWalle(newX, newy);
 				SetPixel(newX, newy, pwcolorBrush);
 				newX = newX + dirX;
 				newy = newy + dirY;
 				distance--;
 			}
-			MoveWalle(newX, newy);
+			if (isOnTheBounds(newX, newy)) MoveWalle(newX, newy);
 			UpdateTexture();
 		}
 		else
@@ -332,7 +330,14 @@ public static class Paint
 		int h = wall_ePosition.Item1 + vertical;
 		int k = wall_ePosition.Item2 + horizontal;
 		if (!isOnTheBounds(h, k)) return 0;
-		return canvas[h,k].ToString()==color? 1 : 0;
+		return canvas[h, k].ToString() == color ? 1 : 0;
+	}
+	public static void Move(int x, int y)
+	{
+		if (isOnTheBounds(x, y))
+		{
+			MoveWalle(x, y);
+		}
 	}
 
 

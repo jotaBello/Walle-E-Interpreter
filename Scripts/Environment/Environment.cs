@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 public class Environment
@@ -23,8 +22,9 @@ public class Environment
 		{"GetCanvasSize",0},
 		{"GetColorCount",5 },
 		{"IsBrushColor",1},
-		{"IsBrushSize",1},	
+		{"IsBrushSize",1},
 		{"IsCanvasColor",3},	
+		{"Move",2},	
 	};
 
 	public Environment()
@@ -52,7 +52,7 @@ public class Environment
 			Dictionary<int, Function> table = funGlobal[name];
 			if (table.ContainsKey(arity))
 			{
-				throw new RuntimeError(fun.name, "already exists.");
+				throw new RuntimeError(fun.name, "aa already exists.");
 			}
 			else
 			{
@@ -174,7 +174,7 @@ public class Environment
 		if (funGlobal.ContainsKey(name) && funGlobal[name].ContainsKey(arity))
 			return funGlobal[name][arity].parameters;
 		else
-				return enclosing.GetParameters(name, arity);
+			return enclosing.GetParameters(name, arity);
 	}
 	public Environment GetClosure(string name, int arity)
 	{

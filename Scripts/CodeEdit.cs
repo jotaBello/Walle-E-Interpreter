@@ -1,22 +1,22 @@
 using Godot;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 public partial class CodeEdit : Godot.CodeEdit
 {
 	[Export] CodeEdit codeEdit;
+	[Export] TextEdit ConsoleLog;
 	[Export] FileDialog SaveFileDialog;
 	[Export] FileDialog ImportFileDialog;
+	
+	
 
 
 	public override void _Ready()
 	{
 		CodeCompletionEnabled = true;
-		CodeCompletionRequested += OnCompletionRequested;
-		TextChanged += OnTextChanged;
+		SyntaxHighlight();
+		ConsoleLogSyntaxHighlight();
 	}
 
 
@@ -76,9 +76,91 @@ public partial class CodeEdit : Godot.CodeEdit
 			GD.Print($"Error al cargar: {ex.Message}");
 		}
 	}
+	void ConsoleLogSyntaxHighlight()
+	{
+		CodeHighlighter codeHighlighter = new CodeHighlighter();
+		ConsoleLog.SyntaxHighlighter = codeHighlighter;
+
+		codeHighlighter.SymbolColor = Colors.Gray;
+		codeHighlighter.NumberColor = Colors.LightGray;
+		codeHighlighter.FunctionColor = Colors.Cyan;
+	}
+
+	void SyntaxHighlight()
+	{
+		CodeHighlighter codeHighlighter = new CodeHighlighter();
+		codeEdit.SyntaxHighlighter = codeHighlighter;
+
+		codeHighlighter.SymbolColor = Colors.Gray;
+		codeHighlighter.NumberColor = Colors.LightGray;
+		codeHighlighter.FunctionColor = Colors.Cyan;
+
+		foreach (string cmd in commands)
+		{
+			codeHighlighter.AddKeywordColor(cmd, keywordColor);
+		}
+
+
+		foreach (string func in functions)
+		{
+			codeHighlighter.AddKeywordColor(func, functionColor);
+		}
+
+
+		foreach (string flow in flowKeywords)
+		{
+			codeHighlighter.AddKeywordColor(flow, flowColor);
+		}
+
+
+		foreach (string op in operators)
+		{
+			codeHighlighter.AddKeywordColor(op, operatorColor);
+		}
+
+
+		codeHighlighter.AddColorRegion("\"", "\"", stringColor, false); // Strings
+		codeHighlighter.AddColorRegion("//", "", commentColor, true);   //LineComment
+	codeHighlighter.AddColorRegion("/*", "*/", commentColor);   //blockComment
+	}
+
+	private readonly Color keywordColor = new Color("#569cd6");      // Blue
+	private readonly Color functionColor = new Color("#dcdcaa");     // LightYellow
+	private readonly Color typeColor = new Color("#4ec9b0");         // Cyan
+	private readonly Color stringColor = new Color("#ce9178");       // LightBrown
+	private readonly Color numberColor = new Color("#b5cea8");       // LightGreen
+	private readonly Color commentColor = new Color("#6a9955");      // Green
+	private readonly Color flowColor = new Color("#c586c0");         // Purple
+	private readonly Color operatorColor = new Color("#d4d4d4");     // LightGray
+
+
+	private readonly string[] commands = {
+		"Spawn", "Color", "Size", "DrawLine", "DrawCircle",
+		"DrawRectangle", "Fill","Move",
+	};
+
+	private readonly string[] functions = {
+		"GetActualX", "GetActualY", "GetCanvasSize", "GetColorCount",
+		"IsBrushColor", "IsBrushSize", "IsCanvasColor"
+	};
+
+	private readonly string[] flowKeywords = {
+		"GoTo", "if", "else", "while", "for", "break", "continue", "return"
+	};
+
+	private readonly string[] operators = {
+		"<-", "\\+", "-", "\\*", "/", "\\*\\*", "%", 
+		"==", ">=", "<=", ">", "<", "&&", "\\|\\|"
+	};
+
+
+
+
+
+
 
 	//AUTOCOMPLETION
-
+	/*
 	private static readonly string[] Keywords = {
 		"Spawn", "Color", "Size", "DrawLine", "DrawCircle",
 		"DrawRectangle", "Fill", "GetActualX", "GetActualY",
@@ -143,19 +225,19 @@ public partial class CodeEdit : Godot.CodeEdit
 	{
 		// Analizar texto antes del cursor
 		var preText = line.Substring(0, caretPos);
-		
+
 		// Si estamos dentro de un Color( ... )
 		if (Regex.IsMatch(preText, @"Color\s*\(\s*[\""\']?[^\""\']*$"))
 			return "color";
-		
+
 		// Si estamos al inicio de línea o después de salto
 		if (string.IsNullOrWhiteSpace(preText))
 			return "command";
-		
+
 		// Si estamos después de una asignación o parámetro
 		if (preText.EndsWith(" ") || preText.EndsWith(","))
 			return "variable";
-		
+
 		// Si estamos en un identificador
 		return "general";
 	}
@@ -190,6 +272,8 @@ public partial class CodeEdit : Godot.CodeEdit
 		AddColorSuggestions();
 		AddVariableSuggestions();
 	}
+	
+	*/
 
 }
 	
