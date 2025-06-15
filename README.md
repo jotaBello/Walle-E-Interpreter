@@ -1,17 +1,16 @@
 <div align="center">
-  <img src="https://img.shields.io/badge/Pixel%20Wall--E–Project-FF6F61.svg" alt="Pixel Wall‑E">
+  
   <h1 align="center">Pixel Wall‑E</h1>
 </div>
 
 <p align="center">
+   <img src="https://img.shields.io/badge/Pixel%20Wall--E–Project-FF6F61.svg" alt="Pixel Wall‑E">  
   <a href="https://opensource.org/licenses/MIT" target="_blank">
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
   </a>
   &nbsp;&nbsp;
-  <a href="#-tabla-de-contenidos">
-    📑 Tabla de Contenidos
-  </a>
 </p>
+
 
 ---
 
@@ -152,8 +151,7 @@ Más allá de las instrucciones básicas de dibujo, soporta variables, asignacio
 
 ## 🔑 Licencia
 
-Distribuido bajo licencia **MIT**.  
-Ver [LICENSE](LICENSE) para más detalles.
+Distribuido bajo licencia **MIT**.
 
 ---  
 
