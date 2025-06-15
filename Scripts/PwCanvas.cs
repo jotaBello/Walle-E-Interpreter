@@ -8,20 +8,24 @@ public partial class PwCanvas : TextureRect
 
 	public override void _Ready()
 	{
-		SetupCanvas();
-		Paint.pwCanvas = this;
-		Paint.canvas = new PwColor[CanvasWidth, CanvasHeight];
+		SetupCanvas(CanvasWidth,CanvasHeight);
 	}
 
-	private void SetupCanvas()
+	public void SetupCanvas(int x,int y)
 	{
-		image = Image.CreateEmpty(CanvasWidth, CanvasHeight, false, Image.Format.Rgba8);
+		Paint.pwCanvas = this;
+		Paint.canvas = new PwColor[x, y];
+
+		CanvasWidth = x;
+		CanvasHeight = y;
+
+		image = Image.CreateEmpty(x, y, false, Image.Format.Rgba8);
 		image.Fill(Colors.White);
 
 		texture = ImageTexture.CreateFromImage(image);
 		Texture = texture;
 
-		Scale = new Vector2(512/CanvasWidth, 512/CanvasHeight);
+		Scale = new Vector2(512/x, 512/y);
 		ExpandMode = ExpandModeEnum.IgnoreSize;
 		StretchMode = StretchModeEnum.Keep;
 		TextureFilter = TextureFilterEnum.Nearest;

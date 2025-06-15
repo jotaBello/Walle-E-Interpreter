@@ -14,7 +14,7 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 
 			for (; current < statements.Count; current++)
 			{
-				if (!(statements[current] is LabelStmt))
+				if (!(statements[current] is LabelStmt) && !Compiler.hadRuntimeError)
 				{
 					execute(statements[current]);
 				}
@@ -54,7 +54,8 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	public void visitPrintStmt(PrintStmt stmt)
 	{
 		object value = evaluate(stmt.expression);
-		LogReporter.LogMessage(value.ToString());
+		if (value != null) LogReporter.LogMessage(value.ToString());
+		else LogReporter.LogMessage("null");
 	}
 
 	public void visitVarStmt(VarStmt stmt)
@@ -306,6 +307,7 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 				return (int)left - (int)right;
 			case TokenType.SLASH:
 				checkNumberOperand(expr.operation, left, right);
+				if ((int)right == 0) throw new RuntimeError(expr.operation, "You can't divide by zero.");
 				return (int)left / (int)right;
 			case TokenType.STAR:
 				checkNumberOperand(expr.operation, left, right);

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.IO;
+using System.Linq;
 
 public partial class CodeEdit : Godot.CodeEdit
 {
@@ -8,8 +9,8 @@ public partial class CodeEdit : Godot.CodeEdit
 	[Export] TextEdit ConsoleLog;
 	[Export] FileDialog SaveFileDialog;
 	[Export] FileDialog ImportFileDialog;
-	
-	
+
+
 
 
 	public override void _Ready()
@@ -17,6 +18,7 @@ public partial class CodeEdit : Godot.CodeEdit
 		CodeCompletionEnabled = true;
 		SyntaxHighlight();
 		ConsoleLogSyntaxHighlight();
+		CodeComplet();
 	}
 
 
@@ -32,6 +34,22 @@ public partial class CodeEdit : Godot.CodeEdit
 	{
 		Compiler.hadError = false;
 		Compiler.resolve(codeEdit.Text);
+		RequestCompletion();
+	}
+	public void _on_spin_box_value_changed(float value)
+	{
+		Paint.pwCanvas.SetupCanvas((int)value, (int)value);
+	}
+
+	public void _on_home_button_pressed()
+	{
+		GetTree().ChangeSceneToFile("res://Scenes/MainMenu.tscn");
+	}
+	public void _on_trash_button_button_pressed()
+	{
+		Paint.ClearCanvas();
+		ConsoleLog.Text = "";
+		codeEdit.Text = "";
 	}
 
 
@@ -95,6 +113,8 @@ public partial class CodeEdit : Godot.CodeEdit
 		codeHighlighter.NumberColor = Colors.LightGray;
 		codeHighlighter.FunctionColor = Colors.Cyan;
 
+
+
 		foreach (string cmd in commands)
 		{
 			codeHighlighter.AddKeywordColor(cmd, keywordColor);
@@ -121,7 +141,7 @@ public partial class CodeEdit : Godot.CodeEdit
 
 		codeHighlighter.AddColorRegion("\"", "\"", stringColor, false); // Strings
 		codeHighlighter.AddColorRegion("//", "", commentColor, true);   //LineComment
-	codeHighlighter.AddColorRegion("/*", "*/", commentColor);   //blockComment
+		codeHighlighter.AddColorRegion("/*", "*/", commentColor);   //blockComment
 	}
 
 	private readonly Color keywordColor = new Color("#569cd6");      // Blue
@@ -149,133 +169,95 @@ public partial class CodeEdit : Godot.CodeEdit
 	};
 
 	private readonly string[] operators = {
-		"<-", "\\+", "-", "\\*", "/", "\\*\\*", "%", 
+		"<-", "\\+", "-", "\\*", "/", "\\*\\*", "%",
 		"==", ">=", "<=", ">", "<", "&&", "\\|\\|"
 	};
 
-
-
-
-
-
-
-	//AUTOCOMPLETION
-	/*
-	private static readonly string[] Keywords = {
-		"Spawn", "Color", "Size", "DrawLine", "DrawCircle",
-		"DrawRectangle", "Fill", "GetActualX", "GetActualY",
-		"GetCanvasSize", "GetColorCount", "IsBrushColor",
-		"IsBrushSize", "IsCanvasColor", "GoTo"
+			
+	private string[] _completionWords =
+	{
+		"Spawn", "Color", "Size", "DrawLine", "DrawCircle","Red","Blue","Green","Yellow","Purple","Black","Orange","White","Transparent",
+		"DrawRectangle", "Fill","Move","GetActualX", "GetActualY", "GetCanvasSize", "GetColorCount",
+		"IsBrushColor", "IsBrushSize", "IsCanvasColor","GoTo", "if", "else", "while", "for","fun", "break", "continue", "return",
 	};
-	private static readonly string[] Colors = {
-		"Red", "Blue", "Green", "Yellow", "Orange",
-		"Purple", "Black", "White", "Transparent"
-	};
-	private readonly HashSet<string> _userDefined = new();
-	private readonly Regex _definitionRegex = new(@"(?<!\S)([a-zA-Z][\w-]*)(?!\S)\s*(?:$|<-)");
-
-	private void OnTextChanged()
-	{
-		UpdateUserDefinitions();
-	}
-	private void UpdateUserDefinitions()
-	{
-		_userDefined.Clear();
-
-		foreach (var line in Text.Split('\n'))
-		{
-			var match = _definitionRegex.Match(line);
-			if (match.Success && !Keywords.Contains(match.Value))
-			{
-				_userDefined.Add(match.Value);
-			}
-		}
-	}
-
-	private void OnCompletionRequested()
-	{
-		var lineIdx = GetCaretLine();
-		var line = GetLine(lineIdx);
-		var caretPos = GetCaretColumn();
-
-		// Determinar contexto actual
-		var context = GetCompletionContext(line, caretPos);
-
-		// Generar sugerencias según el contexto
-		switch (context)
-		{
-			case "color":
-				AddColorSuggestions();
-				break;
-
-			case "command":
-				AddCommandSuggestions();
-				break;
-
-			case "variable":
-				AddVariableSuggestions();
-				break;
-
-			default:
-				AddGeneralSuggestions();
-				break;
-		}
-	}
-	private string GetCompletionContext(string line, int caretPos)
-	{
-		// Analizar texto antes del cursor
-		var preText = line.Substring(0, caretPos);
-
-		// Si estamos dentro de un Color( ... )
-		if (Regex.IsMatch(preText, @"Color\s*\(\s*[\""\']?[^\""\']*$"))
-			return "color";
-
-		// Si estamos al inicio de línea o después de salto
-		if (string.IsNullOrWhiteSpace(preText))
-			return "command";
-
-		// Si estamos después de una asignación o parámetro
-		if (preText.EndsWith(" ") || preText.EndsWith(","))
-			return "variable";
-
-		// Si estamos en un identificador
-		return "general";
-	}
-
-	private void AddColorSuggestions()
-	{
-		foreach (var color in Colors)
-		{
-			AddCodeCompletionOption(CodeCompletionKind.PlainText, color, color);
-		}
-	}
-
-	private void AddCommandSuggestions()
-	{
-		foreach (var keyword in Keywords)
-		{
-			AddCodeCompletionOption(CodeCompletionKind.PlainText, keyword, keyword);
-		}
-	}
-
-	private void AddVariableSuggestions()
-	{
-		foreach (var item in _userDefined)
-		{
-			AddCodeCompletionOption(CodeCompletionKind.PlainText, item, item);
-		}
-	}
-
-	private void AddGeneralSuggestions()
-	{
-		AddCommandSuggestions();
-		AddColorSuggestions();
-		AddVariableSuggestions();
-	}
 	
-	*/
+	public void CodeComplet()
+	{
+		CodeCompletionEnabled = true;
+		
+		string[] prefixes = _completionWords
+			.Select(word => word[0].ToString())
+			.Distinct()
+			.ToArray();
 
+		Godot.Collections.Array<string> pr = new Godot.Collections.Array<string>();
+
+		foreach (var p in prefixes)
+		{
+			pr.Add(p);
+		}
+		
+		CodeCompletionPrefixes = pr;
+		
+		
+		CodeCompletionRequested    += RequestCompletion;
+	}
+
+	private void RequestCompletion()
+	{
+		string prefix = GetCurrentPrefix();
+		if (string.IsNullOrEmpty(prefix)) return;
+		
+		
+		var suggestions = _completionWords
+			.Where(word => word.StartsWith(prefix))
+			.ToList();
+
+		
+		
+		foreach (string word in suggestions)
+		{
+			AddCodeCompletionOption(
+				CodeCompletionKind.PlainText,
+				displayText: word,
+				insertText: word
+			);
+		}
+		
+	
+		UpdateCodeCompletionOptions(true);
+	}
+
+	private string GetCurrentPrefix()
+	{
+		int caretLine = GetCaretLine();
+		int caretColumn = GetCaretColumn();
+		string lineText = GetLine(caretLine);
+		
+		
+		if (caretColumn > lineText.Length)
+		{
+			return "";
+		}
+		
+		int start = caretColumn - 1;
+		while (start >= 0)
+		{
+			char c = lineText[start];
+			if (!(char.IsLetterOrDigit(c) || c == '_'))
+			{
+				break;
+			}
+			start--;
+		}
+		
+		int startIndex = start + 1;
+		int length = caretColumn - startIndex;
+		
+		return lineText.Substring(startIndex, length);
+	}
 }
+
 	
 
 	

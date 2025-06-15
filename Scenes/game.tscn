@@ -1,13 +1,18 @@
-[gd_scene load_steps=7 format=3 uid="uid://b73lgiqugdsew"]
+[gd_scene load_steps=12 format=3 uid="uid://b73lgiqugdsew"]
 
 [ext_resource type="FontFile" uid="uid://6x7ybvm0i1rp" path="res://Fonts/JetBrains Fonts/JetBrainsMono-Regular.ttf" id="1_3dryh"]
 [ext_resource type="Script" uid="uid://drtni40regruy" path="res://Scripts/CodeEdit.cs" id="1_ebmjs"]
+[ext_resource type="Texture2D" uid="uid://mneqdptbdr5m" path="res://Images/UI/TrashBW.png" id="2_h4fw4"]
+[ext_resource type="Texture2D" uid="uid://d3c2mor0w4aqk" path="res://Images/UI/DownloadBW.png" id="2_v158k"]
 [ext_resource type="Script" uid="uid://dlr8ch5pg7jhx" path="res://Scripts/Log.cs" id="3_3dryh"]
+[ext_resource type="Texture2D" uid="uid://bhtyj5a2of82y" path="res://Images/UI/SaveButtonBW.png" id="3_h4fw4"]
 [ext_resource type="Script" uid="uid://bd38g31btn5k0" path="res://Scripts/PwCanvas.cs" id="3_wrm1d"]
-
-[sub_resource type="CodeHighlighter" id="CodeHighlighter_wrm1d"]
+[ext_resource type="Texture2D" uid="uid://bpkgmqyqej402" path="res://Images/UI/RunButtonBW.png" id="4_ldgsr"]
+[ext_resource type="Texture2D" uid="uid://bhfa7p40blxfh" path="res://Images/UI/HomeBW.png" id="5_o5yvi"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_3dryh"]
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_wrm1d"]
 
 [node name="Interfaz" type="Control"]
 layout_mode = 3
@@ -26,19 +31,129 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.223103, 0.223103, 0.223103, 1)
 
-[node name="CodeEdit" type="CodeEdit" parent="." node_paths=PackedStringArray("codeEdit", "ConsoleLog", "SaveFileDialog", "ImportFileDialog")]
+[node name="PwCanvas" type="TextureRect" parent="."]
 layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
+anchors_preset = 4
 anchor_top = 0.5
-anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -600.0
-offset_top = -300.0
-offset_right = -23.0
-offset_bottom = 114.0
-grow_horizontal = 0
+offset_left = 36.0
+offset_top = -239.0
+offset_right = 67.0
+offset_bottom = -208.0
 grow_vertical = 2
+texture = SubResource("ImageTexture_3dryh")
+script = ExtResource("3_wrm1d")
+
+[node name="ButtonsContianer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 110.0
+offset_top = 22.0
+offset_right = 493.0
+offset_bottom = 62.0
+theme_override_constants/separation = 20
+
+[node name="TrashContainer\'" type="MarginContainer" parent="ButtonsContianer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TrashButtonButton" type="Button" parent="ButtonsContianer/TrashContainer\'"]
+texture_filter = 1
+texture_repeat = 1
+layout_mode = 2
+icon = ExtResource("2_h4fw4")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="ImportContainer2" type="MarginContainer" parent="ButtonsContianer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ImportButton" type="Button" parent="ButtonsContianer/ImportContainer2"]
+texture_filter = 1
+texture_repeat = 1
+layout_mode = 2
+icon = ExtResource("2_v158k")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="SaveContainer" type="MarginContainer" parent="ButtonsContianer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SaveButton" type="Button" parent="ButtonsContianer/SaveContainer"]
+texture_filter = 1
+texture_repeat = 1
+layout_mode = 2
+icon = ExtResource("3_h4fw4")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="RunContainer" type="MarginContainer" parent="ButtonsContianer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RunButton" type="Button" parent="ButtonsContianer/RunContainer"]
+texture_filter = 1
+texture_repeat = 1
+layout_mode = 2
+icon = ExtResource("4_ldgsr")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="NumberContainer" type="MarginContainer" parent="ButtonsContianer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SpinBox" type="SpinBox" parent="ButtonsContianer/NumberContainer"]
+texture_filter = 1
+texture_repeat = 1
+layout_mode = 2
+min_value = 7.0
+max_value = 512.0
+value = 31.0
+rounded = true
+alignment = 1
+
+[node name="HomeContainer" type="MarginContainer" parent="ButtonsContianer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HomeButton" type="Button" parent="ButtonsContianer/HomeContainer"]
+texture_filter = 1
+texture_repeat = 1
+layout_mode = 2
+icon = ExtResource("5_o5yvi")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="CodeContainer" type="BoxContainer" parent="."]
+layout_mode = 2
+offset_left = 578.0
+offset_right = 1152.0
+offset_bottom = 648.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+vertical = true
+
+[node name="CodeEditContainer" type="MarginContainer" parent="CodeContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 5
+
+[node name="CodeEdit" type="CodeEdit" parent="CodeContainer/CodeEditContainer" node_paths=PackedStringArray("codeEdit", "ConsoleLog", "SaveFileDialog", "ImportFileDialog")]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.14
 theme_override_colors/current_line_color = Color(1, 1, 1, 0.0392157)
 theme_override_colors/background_color = Color(0.103744, 0.103744, 0.103744, 1)
 theme_override_fonts/font = ExtResource("1_3dryh")
@@ -54,58 +169,25 @@ auto_brace_completion_enabled = true
 auto_brace_completion_highlight_matching = true
 script = ExtResource("1_ebmjs")
 codeEdit = NodePath(".")
-ConsoleLog = NodePath("../ConsoleLog")
-SaveFileDialog = NodePath("../SaveFileDialog")
-ImportFileDialog = NodePath("../ImportFileDialog")
+ConsoleLog = NodePath("../../ConsoleLogContainer/ConsoleLog")
+SaveFileDialog = NodePath("../../../SaveFileDialog")
+ImportFileDialog = NodePath("../../../ImportFileDialog")
 
-[node name="PwCanvas" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 31.0
-offset_top = -258.0
-offset_right = 62.0
-offset_bottom = -227.0
-grow_vertical = 2
-texture = SubResource("ImageTexture_3dryh")
-script = ExtResource("3_wrm1d")
+[node name="ConsoleLogContainer" type="MarginContainer" parent="CodeContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
 
-[node name="RunButton" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -781.0
-offset_top = 12.0
-offset_right = -734.0
-offset_bottom = 50.0
-grow_horizontal = 0
-text = "RUN"
-
-[node name="SaveButton" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -860.0
-offset_top = 19.0
-offset_right = -813.0
-offset_bottom = 57.0
-grow_horizontal = 0
-text = "SAVE"
-
-[node name="ImportButton" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -960.0
-offset_top = 19.0
-offset_right = -890.0
-offset_bottom = 57.0
-grow_horizontal = 0
-text = "IMPORT"
+[node name="ConsoleLog" type="TextEdit" parent="CodeContainer/ConsoleLogContainer" node_paths=PackedStringArray("textEdit")]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/background_color = Color(0.101961, 0.101961, 0.101961, 1)
+theme_override_constants/line_spacing = 5
+script = ExtResource("3_3dryh")
+textEdit = NodePath(".")
 
 [node name="SaveFileDialog" type="FileDialog" parent="."]
 position = Vector2i(250, 150)
@@ -121,21 +203,12 @@ file_mode = 0
 access = 2
 filters = PackedStringArray("*.pw")
 
-[node name="ConsoleLog" type="TextEdit" parent="." node_paths=PackedStringArray("textEdit")]
-layout_mode = 0
-offset_left = 551.0
-offset_top = 454.0
-offset_right = 1129.0
-offset_bottom = 597.0
-theme_override_colors/background_color = Color(0.101961, 0.101961, 0.101961, 1)
-theme_override_constants/line_spacing = 5
-editable = false
-script = ExtResource("3_3dryh")
-textEdit = NodePath(".")
-
-[connection signal="text_changed" from="CodeEdit" to="CodeEdit" method="_on_text_changed"]
-[connection signal="pressed" from="RunButton" to="CodeEdit" method="_on_run_button_pressed"]
-[connection signal="pressed" from="SaveButton" to="CodeEdit" method="_on_save_button_pressed"]
-[connection signal="pressed" from="ImportButton" to="CodeEdit" method="_on_import_button_pressed"]
-[connection signal="file_selected" from="SaveFileDialog" to="CodeEdit" method="_on_save_file_dialog_file_selected"]
-[connection signal="file_selected" from="ImportFileDialog" to="CodeEdit" method="_on_import_file_dialog_file_selected"]
+[connection signal="pressed" from="ButtonsContianer/TrashContainer\'/TrashButtonButton" to="CodeContainer/CodeEditContainer/CodeEdit" method="_on_trash_button_button_pressed"]
+[connection signal="pressed" from="ButtonsContianer/ImportContainer2/ImportButton" to="CodeContainer/CodeEditContainer/CodeEdit" method="_on_import_button_pressed"]
+[connection signal="pressed" from="ButtonsContianer/SaveContainer/SaveButton" to="CodeContainer/CodeEditContainer/CodeEdit" method="_on_save_button_pressed"]
+[connection signal="pressed" from="ButtonsContianer/RunContainer/RunButton" to="CodeContainer/CodeEditContainer/CodeEdit" method="_on_run_button_pressed"]
+[connection signal="value_changed" from="ButtonsContianer/NumberContainer/SpinBox" to="CodeContainer/CodeEditContainer/CodeEdit" method="_on_spin_box_value_changed"]
+[connection signal="pressed" from="ButtonsContianer/HomeContainer/HomeButton" to="CodeContainer/CodeEditContainer/CodeEdit" method="_on_home_button_pressed"]
+[connection signal="text_changed" from="CodeContainer/CodeEditContainer/CodeEdit" to="CodeContainer/CodeEditContainer/CodeEdit" method="_on_text_changed"]
+[connection signal="file_selected" from="SaveFileDialog" to="CodeContainer/CodeEditContainer/CodeEdit" method="_on_save_file_dialog_file_selected"]
+[connection signal="file_selected" from="ImportFileDialog" to="CodeContainer/CodeEditContainer/CodeEdit" method="_on_import_file_dialog_file_selected"]

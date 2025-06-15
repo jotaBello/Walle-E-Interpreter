@@ -1,0 +1,16 @@
+Spawn(0,0)
+
+fun Fib(n)
+{
+	return "Fibonacci"
+}
+
+DrawLine(1,1,Fib(4))
+
+fun ReturnCero()
+{
+	return 0
+}
+
+print 1/ReturnCero()
+

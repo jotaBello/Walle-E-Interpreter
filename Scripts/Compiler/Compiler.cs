@@ -83,7 +83,7 @@ public static class Compiler
 	private static void report(int line, string where, string errorType, string message)
 	{
 
-		LogReporter.LogMessage("[line " + line + "] " + errorType + " error" + where + ": " + message);
+		LogReporter.LogMessage("[line " + line + "] " + errorType + " error" + where + ": " + message );
 		//throw new Exception();
 		hadError = true;
 	}

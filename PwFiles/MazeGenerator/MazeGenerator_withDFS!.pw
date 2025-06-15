@@ -1,0 +1,55 @@
+Spawn(1,1)
+fun isOnTheBounds(x,y)
+{
+	return x>=0 && y>=0 && x<GetCanvasSize() && y<GetCanvasSize()
+}
+fun dx(i)
+{
+	if(i==0) return 2
+	if(i==1) return -2
+	return 0
+}
+fun dy(i)
+{
+	if(i==2) return 2
+	if(i==3) return -2
+	return 0
+}
+fun SetPixel(x,y)
+{
+	Move(x,y)
+	DrawLine(0,0,1)
+}
+fun CarveMaze(x,y,colorWall)
+{
+	r<-rand(0,3)
+	for(i<-r;i<r+4;i<-i+1)
+	{
+		nx<-x+dx(i%4)
+		ny<-y+dy(i%4)
+		if(isOnTheBounds(nx,ny) && GetColor(nx,ny)==colorWall)
+		{
+			SetPixel(x+dx(i%4)/2,y+dy(i%4)/2)
+			SetPixel(nx,ny)
+			CarveMaze(nx,ny,colorWall)
+		}
+	}
+}
+
+color_of_the_walls <- "Black" //walls_color
+color_of_the_path <- "Purple"//path_color
+
+
+Color(color_of_the_walls) 
+Fill()
+Color(color_of_the_path) 
+
+
+x<-1
+y<-1
+
+SetPixel(x,y)
+CarveMaze(x,y,color_of_the_walls)
+
+
+print "Maze Generated!!"

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://coqa7mscde3hh"
-path="res://.godot/imported/158856-3840x2160-desktop-4k-walle-wallpaper-photo.jpg-8f642f50831054160e20fff40d279c91.ctex"
+uid="uid://ceuoghiugagx2"
+path="res://.godot/imported/SpeakerOn.png-7d0a776a8225ea6c5649eec747c64475.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Images/158856-3840x2160-desktop-4k-walle-wallpaper-photo.jpg"
-dest_files=["res://.godot/imported/158856-3840x2160-desktop-4k-walle-wallpaper-photo.jpg-8f642f50831054160e20fff40d279c91.ctex"]
+source_file="res://Images/UI/SpeakerOn.png"
+dest_files=["res://.godot/imported/SpeakerOn.png-7d0a776a8225ea6c5649eec747c64475.ctex"]
 
 [params]
 

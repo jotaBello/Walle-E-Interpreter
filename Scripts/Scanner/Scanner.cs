@@ -146,7 +146,7 @@ public class Scanner
                 }
                 else
                 {
-                    Compiler.Lexicalerror(c.ToString(),line, "Unexpected character.");
+                    Compiler.Lexicalerror(c.ToString(),line, "Invalid character.");
                 }
                 break;
         }
@@ -161,7 +161,7 @@ public class Scanner
         }
         if (isAtEnd())
         {
-            Compiler.Lexicalerror("end",line, "Unfinished string.");
+            Compiler.Lexicalerror("end",line, "Unterminated string literal.");
             return;
         }
 

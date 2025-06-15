@@ -115,6 +115,14 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 					error(expr.operation, "Both operands must be numbers or strings.");
 				}
 			}
+			else if (expr.operation.type == TokenType.SLASH)
+			{
+				Object right = ((Literal)expr.right).value;
+				if (right is int && (int)right == 0)
+				{
+					error(expr.operation, "You can't divide by zero.");
+				}
+			}
 			else
 			{
 				Object left = ((Literal)expr.left).value; Object right = ((Literal)expr.right).value;

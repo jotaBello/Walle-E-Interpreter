@@ -164,7 +164,7 @@ public class Parser
 
 	private Stmt ifStatement()
 	{
-		consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+		consume(TokenType.LEFT_PAREN, "Expect '(' after if.");
 		Expr condition = expression();
 		consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
 		SkipEOL();
@@ -260,7 +260,7 @@ public class Parser
 	{
 		Token keyword = previous();
 		Expr value = null;
-		if (!check(TokenType.SEMICOLON)) {
+		if (!check(TokenType.EOL)) {
 		value = expression();
 		}
 		consume(TokenType.EOL, "Expect 'EOL' after return value.");
