@@ -31,7 +31,7 @@ public static class Paint
 	{
 		pwCanvas.CanvasWidth = width;
 		pwCanvas.CanvasHeight = height;
-		pwCanvas.ClearCanvas(null);
+		pwCanvas.ClearCanvas();
 	}
 
 	private static void MoveWalle(int x, int y)
@@ -271,7 +271,7 @@ public static class Paint
 	}
 	public static void ClearCanvas()
 	{
-		pwCanvas.ClearCanvas(null);
+		pwCanvas.ClearCanvas();
 		UpdateTexture();
 
 		wasSpawned = false;

@@ -36,20 +36,22 @@ layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = 36.0
-offset_top = -239.0
-offset_right = 67.0
-offset_bottom = -208.0
+offset_left = 67.0
+offset_top = -383.0
+offset_right = 847.0
+offset_bottom = 397.0
 grow_vertical = 2
+scale = 800
 texture = SubResource("ImageTexture_3dryh")
 script = ExtResource("3_wrm1d")
+scale = 800
 
 [node name="ButtonsContianer" type="HBoxContainer" parent="."]
 layout_mode = 0
 offset_left = 110.0
 offset_top = 22.0
-offset_right = 493.0
-offset_bottom = 62.0
+offset_right = 727.0
+offset_bottom = 92.0
 theme_override_constants/separation = 20
 
 [node name="TrashContainer\'" type="MarginContainer" parent="ButtonsContianer"]
@@ -132,10 +134,12 @@ icon_alignment = 1
 expand_icon = true
 
 [node name="CodeContainer" type="BoxContainer" parent="."]
-layout_mode = 2
-offset_left = 578.0
-offset_right = 1152.0
-offset_bottom = 648.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 894.0
+offset_right = -30.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -157,7 +161,7 @@ size_flags_stretch_ratio = 3.14
 theme_override_colors/current_line_color = Color(1, 1, 1, 0.0392157)
 theme_override_colors/background_color = Color(0.103744, 0.103744, 0.103744, 1)
 theme_override_fonts/font = ExtResource("1_3dryh")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 24
 placeholder_text = "Code here..."
 minimap_draw = true
 syntax_highlighter = SubResource("CodeHighlighter_wrm1d")
@@ -186,18 +190,19 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/background_color = Color(0.101961, 0.101961, 0.101961, 1)
 theme_override_constants/line_spacing = 5
+theme_override_font_sizes/font_size = 24
 script = ExtResource("3_3dryh")
 textEdit = NodePath(".")
 
 [node name="SaveFileDialog" type="FileDialog" parent="."]
-position = Vector2i(250, 150)
+position = Vector2i(620, 360)
 access = 2
 filters = PackedStringArray("*.pw")
 
 [node name="ImportFileDialog" type="FileDialog" parent="."]
 auto_translate_mode = 1
 title = "Open a File"
-position = Vector2i(250, 150)
+position = Vector2i(620, 360)
 ok_button_text = "Open"
 file_mode = 0
 access = 2

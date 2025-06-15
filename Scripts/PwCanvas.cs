@@ -3,6 +3,7 @@ public partial class PwCanvas : TextureRect
 {
 	[Export] public int CanvasWidth = 31;
 	[Export] public int CanvasHeight = 31;
+	[Export] public int scale = 720;
 	private Image image;
 	private ImageTexture texture;
 
@@ -11,25 +12,25 @@ public partial class PwCanvas : TextureRect
 		SetupCanvas(CanvasWidth,CanvasHeight);
 	}
 
-	public void SetupCanvas(int x,int y)
-	{
-		Paint.pwCanvas = this;
-		Paint.canvas = new PwColor[x, y];
+	public void SetupCanvas(int x, int y)
+{
+	Paint.pwCanvas = this;
+	Paint.canvas = new PwColor[x, y];
 
-		CanvasWidth = x;
-		CanvasHeight = y;
+	CanvasWidth = x;
+	CanvasHeight = y;
 
-		image = Image.CreateEmpty(x, y, false, Image.Format.Rgba8);
-		image.Fill(Colors.White);
+	image = Image.CreateEmpty(x, y, false, Image.Format.Rgba8);
+	image.Fill(Colors.White);
+	texture = ImageTexture.CreateFromImage(image);
+	Texture = texture;
 
-		texture = ImageTexture.CreateFromImage(image);
-		Texture = texture;
-
-		Scale = new Vector2(512/x, 512/y);
-		ExpandMode = ExpandModeEnum.IgnoreSize;
-		StretchMode = StretchModeEnum.Keep;
-		TextureFilter = TextureFilterEnum.Nearest;
-	}
+		Scale = new Vector2(1, 1);
+	
+	ExpandMode = ExpandModeEnum.KeepSize;
+	StretchMode = StretchModeEnum.Scale;
+	TextureFilter = TextureFilterEnum.Nearest;
+}
 	public void SetPixel(int x, int y, Color color)
 	{
 		image.SetPixel(x, y, color);
@@ -38,9 +39,9 @@ public partial class PwCanvas : TextureRect
 	{
 		return image.GetPixel(x, y);
 	}
-	public void ClearCanvas(Color? fillColor)
+	public void ClearCanvas()
 	{
-		image.Fill(fillColor ?? Colors.White);
+		image.Fill(Colors.White);
 	}
 	public void UpdateTexture()
 	{
