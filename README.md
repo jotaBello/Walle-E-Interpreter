@@ -8,7 +8,6 @@
   <a href="https://opensource.org/licenses/MIT" target="_blank">
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
   </a>
-  &nbsp;&nbsp;
 </p>
 
 
