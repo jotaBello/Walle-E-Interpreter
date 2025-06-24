@@ -128,10 +128,16 @@ Más allá de las instrucciones básicas de dibujo, soporta variables, asignacio
 
 ## 🚀 Cómo Empezar
 
-1. **Clonar repositorio**  
-2. **Restaurar dependencias**  
-3. **Ejecutar en Godot**  
-4. **Uso**  
+- **Para usar el editor de codigo**
+1. Descargar ultimo release  
+2. Descomprime y ejecuta el .exe   
+
+
+- **Para ver el proyecto**
+1. Clonar repositorio  
+2. Restaurar dependencias
+3. Ejecutar en Godot 
+4. Uso
    - Define tu canvas y escribe código en el editor  
    - Presiona **Run** para ver el resultado en el canvas  
    - Carga/guarda scripts con extensión `.pw`

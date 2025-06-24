@@ -112,6 +112,7 @@ public class Logical : Expr
 
 public class Call : Expr
 {
+	public int loopCount=0;
 	public Token name;
 	public Token paren;
 	public List<Expr> parameters;

@@ -174,6 +174,7 @@ public class LabelStmt : Stmt
 }
 public class GoToStmt : Stmt
 {
+	public int loopCount = 0;
 	public Token label;
 
 	public Expr condition;

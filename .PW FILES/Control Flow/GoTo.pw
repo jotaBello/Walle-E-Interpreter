@@ -1,0 +1,7 @@
+Spawn(0,0)
+i<-0
+Color("Black")
+loop
+i<-i+1
+DrawLine(1,0,1)
+GoTo[loop](i<20000)

@@ -85,8 +85,10 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	}
 	public void visitGoToStmt(GoToStmt stmt)
 	{
+		if (stmt.loopCount > 10000) throw new RuntimeError(new Token(TokenType.GOTO, "GoTo", null, current+1),"You entered in an infinite loop");
 		if (isTruthy(evaluate(stmt.condition)))
 		{
+			stmt.loopCount++;
 			current = environment.labelget(stmt.label);
 		}
 	}
@@ -145,6 +147,11 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 
 	public object visitCallExpr(Call expr)
 	{
+		if (expr.loopCount > 100000) throw new RuntimeError(expr.name, "You entered in an infinite recursive loop");
+
+		expr.loopCount++;
+
+
 		if (environment.IsBuiltin(expr.name.lexeme, expr.Arity))
 		{
 			List<object> parameters = new List<object>();
@@ -230,13 +237,13 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 
 		if (!environment.IsFunction(expr.name))
 		{
-			Compiler.runtimeError(new RuntimeError(expr.name, $"{expr.name.lexeme} function does'nt exist in this context."));
+			Compiler.runtimeError(new RuntimeError(expr.name, $"{expr.name.lexeme} function doesn't exist in this context."));
 			return null;
 		}
 
 		if (!environment.IsFunction(expr.name, expr.Arity))
 		{
-			Compiler.runtimeError(new RuntimeError(expr.name, $"{expr.name.lexeme} function does'nt take {expr.Arity} arguments."));
+			Compiler.runtimeError(new RuntimeError(expr.name, $"{expr.name.lexeme} function doesn't take {expr.Arity} arguments."));
 			return null;
 		}
 
@@ -389,9 +396,12 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 
 	public void visitWhileStmt(WhileStmt stmt)
 	{
+		int count = 10000;
 		while (isTruthy(evaluate(stmt.condition)))
 		{
 			execute(stmt.body);
+			count--;
+			if (count < 0) throw new RuntimeError(new Token(TokenType.WHILE,"while",null,current+1), "You entered in an infinite loop");
 		}
 	}
 

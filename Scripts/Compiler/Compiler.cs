@@ -90,10 +90,9 @@ public static class Compiler
 
 	public static void runtimeError(RuntimeError error)
 	{
-		report(error.token.line,"","Runtime",error.message);
+		report(error.token.line," at " +error.token.lexeme,"Runtime",error.message);
 		hadRuntimeError = true;
 		//throw new Exception();
-		
 	}
  
 }

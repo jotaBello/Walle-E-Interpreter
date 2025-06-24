@@ -1,28 +1,16 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-public enum PwColor
-{	
-	White,
-	Transparent,
-	Red,
-	Blue,
-	Green,
-	Yellow,
-	Orange,
-	Purple,
-	Black,
-	
-}
+using System.Text.RegularExpressions;
 
 public static class Paint
 {
 	static bool wasSpawned = false;
 	static Tuple<int, int> wall_ePosition = new Tuple<int, int>(0, 0);
-	static PwColor colorBrush = PwColor.Transparent;
-	static Godot.Color pwcolorBrush = Colors.Transparent;
+	static Color pwcolorBrush = Colors.Transparent;
+	static Color colorBrush = Colors.Transparent;
 	static int sizeBrush = 1;
-	static public PwColor[,] canvas;
+	static public Color[,] canvas;
 	static public PwCanvas pwCanvas;
 
 
@@ -32,6 +20,16 @@ public static class Paint
 		pwCanvas.CanvasWidth = width;
 		pwCanvas.CanvasHeight = height;
 		pwCanvas.ClearCanvas();
+	}
+	public static void FillWhite()
+	{
+		for (int i = 0; i < canvas.GetLength(0); i++)
+		{
+			for (int j = 0; j < canvas.GetLength(1); j++)
+			{
+				canvas[i, j] = Colors.White;
+			}
+		}
 	}
 
 	private static void MoveWalle(int x, int y)
@@ -67,45 +65,63 @@ public static class Paint
 		switch (color)
 		{
 			case "Red":
-				colorBrush = PwColor.Red;
+				colorBrush = Colors.Red;
 				pwcolorBrush = Colors.Red;
 				break;
 			case "Blue":
-				colorBrush = PwColor.Blue;
+				colorBrush = Colors.Blue;
 				pwcolorBrush = Colors.Blue;
 				break;
 			case "Green":
-				colorBrush = PwColor.Green;
+				colorBrush = Colors.Green;
 				pwcolorBrush = Colors.Green;
 				break;
 			case "Yellow":
-				colorBrush = PwColor.Yellow;
+				colorBrush = Colors.Yellow;
 				pwcolorBrush = Colors.Yellow;
 				break;
 			case "Purple":
-				colorBrush = PwColor.Purple;
+				colorBrush = Colors.Purple;
 				pwcolorBrush = Colors.Purple;
 				break;
 			case "Black":
-				colorBrush = PwColor.Black;
+				colorBrush = Colors.Black;
 				pwcolorBrush = Colors.Black;
 				break;
 			case "Orange":
-				colorBrush = PwColor.Orange;
+				colorBrush = Colors.Orange;
 				pwcolorBrush = Colors.Orange;
 				break;
 			case "White":
-				colorBrush = PwColor.White;
+				colorBrush = Colors.White;
 				pwcolorBrush = Colors.White;
 				break;
 			case "Transparent":
-				colorBrush = PwColor.Transparent;
+				colorBrush = Colors.Transparent;
 				pwcolorBrush = Colors.Transparent;
 				break;
 			default:
+				if (IsValidHexColor(color))
+				{
+					pwcolorBrush = Godot.Color.FromHtml(color);
+					colorBrush = pwcolorBrush;
+					return;
+				}
 				throw new RuntimeError(null, "Unexpected Color");
 		}
+
+
 	}
+	private static readonly Regex _hexColorRegex = new Regex(
+		@"^#?([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$",
+		RegexOptions.Compiled
+	);
+
+	public static bool IsValidHexColor(string hex)
+	{
+		return _hexColorRegex.IsMatch(hex);
+	}
+
 	public static void Size(int k)
 	{
 		if (k >= 1)
@@ -208,7 +224,7 @@ public static class Paint
 	{
 		Queue<Tuple<int, int>> queue = new Queue<Tuple<int, int>>() { };
 		queue.Enqueue(wall_ePosition);
-		PwColor color = canvas[wall_ePosition.Item1, wall_ePosition.Item2];
+		Color color = canvas[wall_ePosition.Item1, wall_ePosition.Item2];
 
 		bool[,] mask = new bool[canvas.GetLength(0), canvas.GetLength(1)];
 		mask[wall_ePosition.Item1, wall_ePosition.Item2] = true;
@@ -236,7 +252,7 @@ public static class Paint
 	}
 	public static void SetOnePixel(int x, int y, Godot.Color color)
 	{
-		if (colorBrush != PwColor.Transparent)
+		if (colorBrush != Colors.Transparent)
 		{
 			canvas[x, y] = colorBrush;
 			pwCanvas.SetPixel(x, y, color);
@@ -245,7 +261,7 @@ public static class Paint
 
 	public static void SetPixel(int x, int y, Godot.Color color)
 	{
-		if (colorBrush != PwColor.Transparent)
+		if (colorBrush != Colors.Transparent)
 		{
 			for (int i = 0; i < canvas.GetLength(0); i++)
 			{
@@ -276,15 +292,15 @@ public static class Paint
 
 		wasSpawned = false;
 		wall_ePosition = new Tuple<int, int>(0, 0);
-		colorBrush = PwColor.Transparent;
+		colorBrush = Colors.Transparent;
 		pwcolorBrush = Colors.Transparent;
 		sizeBrush = 1;
-		canvas = new PwColor[pwCanvas.CanvasHeight, pwCanvas.CanvasWidth];
+		canvas = new Color[pwCanvas.CanvasHeight, pwCanvas.CanvasWidth];
 	}
 	public static string GetColor(int x, int y)
 	{
 		if (!isOnTheBounds(x, y)) throw new RuntimeError(null, "Is an invalid pixel");
-		return canvas[x, y].ToString();
+		return ToPwString(canvas[x, y]);
 	}
 	public static int GetActualX()
 	{
@@ -330,7 +346,7 @@ public static class Paint
 		int h = wall_ePosition.Item1 + vertical;
 		int k = wall_ePosition.Item2 + horizontal;
 		if (!isOnTheBounds(h, k)) return 0;
-		return canvas[h, k].ToString() == color ? 1 : 0;
+		return ToPwString(canvas[h, k]) == color ? 1 : 0;
 	}
 	public static void Move(int x, int y)
 	{
@@ -339,6 +355,48 @@ public static class Paint
 			MoveWalle(x, y);
 		}
 	}
+	public static string ToPwString(Color color)
+	{
+		if (color == Colors.Red)
+		{
+			return "Red";
+		}
+		else if (color == Colors.Blue)
+		{
+			return "Blue";
+		}
+		else if (color == Colors.Green)
+		{
+			return "Green";
+		}
+		else if (color == Colors.Yellow)
+		{
+			return "Yellow";
+		}
+		else if (color == Colors.Purple)
+		{
+			return "Purple";
+		}
+		else if (color == Colors.Black)
+		{
+			return "Black";
+		}
+		else if (color == Colors.Orange)
+		{
+			return "Orange";
+		}
+		else if (color == Colors.White)
+		{
+			return "White";
+		}
+		else if (color == Colors.Transparent)
+		{
+			return "Transparent";
+		}
+		else
+		{
+			return color.ToString();
+		}
 
-
+	}
 }

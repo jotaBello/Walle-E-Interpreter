@@ -13,26 +13,29 @@ public partial class PwCanvas : TextureRect
 	}
 
 	public void SetupCanvas(int x, int y)
-{
-	Paint.pwCanvas = this;
-	Paint.canvas = new PwColor[x, y];
+	{
+		Paint.pwCanvas = this;
+		Paint.canvas = new Color[x, y];
+		Paint.FillWhite();
 
-	CanvasWidth = x;
-	CanvasHeight = y;
+		CanvasWidth = x;
+		CanvasHeight = y;
 
-	image = Image.CreateEmpty(x, y, false, Image.Format.Rgba8);
-	image.Fill(Colors.White);
-	texture = ImageTexture.CreateFromImage(image);
-	Texture = texture;
+		image = Image.CreateEmpty(x, y, false, Image.Format.Rgba8);
+		image.Fill(Colors.White);
+		texture?.Dispose();
+		texture = ImageTexture.CreateFromImage(image);
+		Texture = texture;
 
 		Scale = new Vector2(1, 1);
-	
-	ExpandMode = ExpandModeEnum.KeepSize;
-	StretchMode = StretchModeEnum.Scale;
-	TextureFilter = TextureFilterEnum.Nearest;
-}
+		
+		ExpandMode = ExpandModeEnum.FitWidthProportional;
+		StretchMode = StretchModeEnum.KeepAspectCentered;
+		TextureFilter = TextureFilterEnum.Nearest;
+	}
 	public void SetPixel(int x, int y, Color color)
 	{
+		color.Clamp();
 		image.SetPixel(x, y, color);
 	}
 	public Color GetPixel(int x, int y)

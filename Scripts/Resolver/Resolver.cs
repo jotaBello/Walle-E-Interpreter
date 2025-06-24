@@ -58,7 +58,7 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 					}
 				}
 			}
-			error(new Token(TokenType.IDENTIFIER,"begin", null,0), "Walle_E must be spawned first");
+			error(new Token(TokenType.IDENTIFIER,"begin", null,1), "Walle_E must be spawned first");
 		}
 	}
 
@@ -196,8 +196,8 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 			}
 		}
 
-		if (!IsFunction) error(expr.name, $"This function does'nt exist in this context.");
-		else if (!IsFunctionA) error(expr.name, $"This function does'nt take {expr.Arity} arguments.");
+		if (!IsFunction) error(expr.name, $"This function doesn't exist in this context.");
+		else if (!IsFunctionA) error(expr.name, $"This function doesn't take {expr.Arity} arguments.");
 
 
 		if (interpreter.environment.IsBuiltin(expr.name.lexeme, expr.Arity))
@@ -414,7 +414,7 @@ public class Resolver : Expr.Visitor<object>, Stmt.Visitor
 		resolve(stmt.condition);
 		if (!scopes.Peek().islabel(stmt.label))
 		{
-			error(stmt.label, "label does'nt exist in this context");
+			error(stmt.label, "label doesn't exist in this context");
 		}
 	}
 }

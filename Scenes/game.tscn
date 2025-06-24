@@ -32,6 +32,7 @@ grow_vertical = 2
 color = Color(0.223103, 0.223103, 0.223103, 1)
 
 [node name="PwCanvas" type="TextureRect" parent="."]
+texture_filter = 1
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
