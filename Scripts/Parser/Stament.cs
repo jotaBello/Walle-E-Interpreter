@@ -100,13 +100,15 @@ public class IfStmt : Stmt
 
 public class WhileStmt : Stmt
 {
+	public Token name;
 	public Expr condition;
 	public Stmt body;
 
-	public WhileStmt(Expr condition, Stmt body)
+	public WhileStmt(Expr condition, Stmt body, Token name)
 	{
 		this.condition = condition;
 		this.body = body;
+		this.name = name;
 	}
 	override public void accept(Visitor visitor)
 	{
@@ -174,15 +176,17 @@ public class LabelStmt : Stmt
 }
 public class GoToStmt : Stmt
 {
+	public Token name;
 	public int loopCount = 0;
 	public Token label;
 
 	public Expr condition;
 
-	public GoToStmt(Token label, Expr condition)
+	public GoToStmt(Token label, Expr condition, Token name)
 	{
 		this.label = label;
 		this.condition = condition;
+		this.name = name;
 	}
 	override public void accept(Visitor visitor)
 	{

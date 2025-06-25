@@ -22,12 +22,14 @@ Más allá de las instrucciones básicas de dibujo, soporta variables, asignacio
 
 ## 📑 Tabla de Contenidos
 
-- [🎯 Características Principales](#-características-principales)  
+- [🎯 Características Principales](#-características-principales)
+- [📷 Capturas de pantalla](#-capturas-de-pantalla)    
 - [🖌️ Comandos del Lenguaje](#️-comandos-del-lenguaje)  
 - [🔧 Estructuras y Funciones](#-estructuras-y-funciones)
 - [🏗️ Arquitectura del Proyecto](#️-arquitectura-del-proyecto)  
 - [🧰 Tecnologías](#-tecnologías)  
 - [🚀 Cómo Empezar](#-cómo-empezar)  
+- [🤖 Convertidor de imagen](#-convertidor-de-imagen)  
 - [🤝 Contribuciones](#-contribuciones)  
 - [🔑 Licencia](#-licencia)  
 
@@ -43,6 +45,19 @@ Más allá de las instrucciones básicas de dibujo, soporta variables, asignacio
 - **Control de flujo**: `if…else`, `while`, `for`, etiquetas y `GoTo` condicional  
 - **Declaración de funciones** con ámbitos sólidos y soporte a **recursión**  
 - **Sistema de expresiones** aritméticas y booleanas, literales, variables y llamadas
+---
+
+## 📷 Capturas de pantalla
+
+- ### **Laberinto** generado con un algoritmo recursivo en el lenguaje pw  
+![Maze](Images/Screenshots/Maze.png)
+
+- ### **Pixel-Art** usando el Convertidor de Imagen
+![HollowKnight](Images/Screenshots/HollowKnight.png)
+
+![FL4K](Images/Screenshots/FL4K.png)
+
+
 ---
 
 ## 🖌️ Comandos del Lenguaje
@@ -141,6 +156,14 @@ Más allá de las instrucciones básicas de dibujo, soporta variables, asignacio
    - Define tu canvas y escribe código en el editor  
    - Presiona **Run** para ver el resultado en el canvas  
    - Carga/guarda scripts con extensión `.pw`
+
+---
+
+## 🤖 Convertidor de imagen
+
+- **Para usar el Convertidor de Imagen**
+1. Copiar tu imagen a la carpeta ImageConverter  
+2. En el archivo ImageConverter.py poner el nombre de tu imagen y el nombre del archivo que quieres generar
 
 ---
 

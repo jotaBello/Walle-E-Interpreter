@@ -85,7 +85,7 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 	}
 	public void visitGoToStmt(GoToStmt stmt)
 	{
-		if (stmt.loopCount > 10000) throw new RuntimeError(new Token(TokenType.GOTO, "GoTo", null, current+1),"You entered in an infinite loop");
+		if (stmt.loopCount > 10000) throw new RuntimeError(stmt.name,"You entered in an infinite loop");
 		if (isTruthy(evaluate(stmt.condition)))
 		{
 			stmt.loopCount++;
@@ -401,7 +401,7 @@ public class Interpreter : Expr.Visitor<object>, Stmt.Visitor
 		{
 			execute(stmt.body);
 			count--;
-			if (count < 0) throw new RuntimeError(new Token(TokenType.WHILE,"while",null,current+1), "You entered in an infinite loop");
+			if (count < 0) throw new RuntimeError(stmt.name, "You entered in an infinite loop");
 		}
 	}
 

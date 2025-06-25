@@ -261,21 +261,29 @@ public static class Paint
 
 	public static void SetPixel(int x, int y, Godot.Color color)
 	{
-		if (colorBrush != Colors.Transparent)
+		if (sizeBrush == 1)
 		{
-			for (int i = 0; i < canvas.GetLength(0); i++)
+			canvas[x, y] = colorBrush;
+			pwCanvas.SetPixel(x, y, color);
+			return;
+		}
+		
+
+		if (colorBrush != Colors.Transparent)
 			{
-				for (int j = 0; j < canvas.GetLength(1); j++)
+				for (int i = 0; i < canvas.GetLength(0); i++)
 				{
-					if (isOnTheSquare(i, j))
+					for (int j = 0; j < canvas.GetLength(1); j++)
 					{
-						canvas[i, j] = colorBrush;
-						pwCanvas.SetPixel(i, j, color);
+						if (isOnTheSquare(i, j))
+						{
+							canvas[i, j] = colorBrush;
+							pwCanvas.SetPixel(i, j, color);
+						}
 					}
 				}
-			}
 
-		}
+			}
 		bool isOnTheSquare(int i, int j)
 		{
 			return Math.Max(Math.Abs(i - x), Math.Abs(j - y)) <= sizeBrush / 2;

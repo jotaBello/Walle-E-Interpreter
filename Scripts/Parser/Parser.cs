@@ -181,15 +181,19 @@ public class Parser
 
 	private Stmt whileStatement()
 	{
+		Back();
+		Token name = consume(TokenType.WHILE, "Expected while");
 		consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
 		Expr condition = expression();
 		consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
 		SkipEOL();
 		Stmt body = statement();
-		return new WhileStmt(condition, body);
+		return new WhileStmt(condition, body,name);
 	}
 	private Stmt GoToStatement()
 	{
+		Back();
+		Token name = consume(TokenType.GOTO, "Expected GoTo");
 		consume(TokenType.LEFT_COR, "Expect '[' after 'GoTo'.");
 		Token label = consume(TokenType.IDENTIFIER, "Expect label in 'GoTo'.");
 		consume(TokenType.RIGHT_COR, "Expect ']' after label");
@@ -198,11 +202,14 @@ public class Parser
 		Expr condition = expression();
 		consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
 
-		return new GoToStmt(label,condition);
+		return new GoToStmt(label,condition,name);
 	}
 
 	private Stmt forStatement()
 	{
+		Back();
+		Token name = consume(TokenType.FOR, "Expected for");
+
 		consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
 
 		Stmt initializer;
@@ -245,7 +252,7 @@ public class Parser
 		}
 
 		if (condition == null) condition = new Literal(true);
-		body = new WhileStmt(condition, body);
+		body = new WhileStmt(condition, body,name);
 
 		if (initializer != null)
 		{
