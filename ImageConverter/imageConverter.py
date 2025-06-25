@@ -1,9 +1,11 @@
 from PIL import Image
 
-def image_to_hex(image_path, file_name):
+def image_to_hex(image_path, file_name,image_scale):
 
         img = Image.open(image_path)
-        
+
+        if image_scale!= 1 and img.size != (image_scale, image_scale):
+            img = img.resize((image_scale, image_scale))
 
         img=img.convert("RGB")
 
@@ -29,4 +31,8 @@ image_path = "Image.png" #CHANGE HERE THE IMAGE NAME
 
 file_name = "File.pw"  #CHANGE HERE THE FILE NAME
 
-image_to_hex(image_path,image_path)
+image_scale = -1  #CHANGE HERE THE SCALE OF THE IMAGE (-1 IF YOU DONT WANT TO SCALE)
+
+
+#Run this file
+image_to_hex(image_path,image_path,image_scale)
